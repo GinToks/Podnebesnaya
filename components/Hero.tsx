@@ -143,7 +143,7 @@ export default function Hero() {
             </motion.div>
           </div>
           <div className="relative h-64 sm:h-80 lg:h-96 flex items-center justify-center">
-            <div className="relative w-full h-full rounded-2xl overflow-hidden border border-sakura/30 shadow-lg">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-lg">
               <Image
                 src="/IMG_7265.PNG"
                 alt="Поднебесная - японская эстетика"

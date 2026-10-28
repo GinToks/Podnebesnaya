@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { createToken, COOKIE_NAME, MAX_AGE } from "@/lib/auth";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 const PASSWORD_FILE = path.join(process.cwd(), "data", "admin-password.txt");
@@ -16,7 +17,6 @@ function getStoredPassword(): string {
   return ADMIN_PASSWORD;
 }
 
-// Simple in-memory rate limiting (per-process; use Redis in production)
 const attempts = new Map<string, { count: number; blockedUntil: number }>();
 
 function getClientIp(req: NextRequest): string {
@@ -40,7 +40,16 @@ export async function POST(req: NextRequest) {
 
   if (password === getStoredPassword()) {
     attempts.delete(ip);
-    return NextResponse.json({ success: true });
+    const token = await createToken();
+    const res = NextResponse.json({ success: true });
+    res.cookies.set(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: MAX_AGE,
+      path: "/",
+    });
+    return res;
   }
 
   rl.count += 1;

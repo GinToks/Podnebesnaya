@@ -25,12 +25,14 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const isAdmin = useAdminAuthStore((state) => state.isAuthenticated);
+  const checkAuth = useAdminAuthStore((state) => state.checkAuth);
   const pathname = usePathname();
   const isHome = pathname === "/";
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    checkAuth();
+  }, [checkAuth]);
 
   return (
     <header className="relative z-20">

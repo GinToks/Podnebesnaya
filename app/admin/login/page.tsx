@@ -9,8 +9,6 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const login = useAdminAuthStore((state) => state.login);
-  const isBlocked = useAdminAuthStore((state) => state.isBlocked);
-  const getRemainingBlockTime = useAdminAuthStore((state) => state.getRemainingBlockTime);
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {

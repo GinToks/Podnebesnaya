@@ -23,7 +23,7 @@ import type { Product, ScentCategory } from "@/data/products";
 type AdminTab = "catalog" | "orders" | "promos" | "banners" | "collections" | "categories" | "quiz" | "analytics" | "settings" | "scent-calendar" | "gift-sets";
 
 export default function AdminPage() {
-  const { isAuthenticated, logout } = useAdminAuthStore();
+  const { isAuthenticated, isLoading, logout, checkAuth } = useAdminAuthStore();
   const router = useRouter();
   const { products, addProduct, updateProduct, deleteProduct, fetchProducts: seed, reorderProducts } =
     useCatalogStore();
@@ -60,10 +60,14 @@ export default function AdminPage() {
   const [draggedId, setDraggedId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    checkAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
       router.push("/admin/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoading, router]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -74,12 +78,16 @@ export default function AdminPage() {
     }
   }, [isAuthenticated]);
 
-  if (!isAuthenticated) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg">
-        <div className="text-ink-muted">Загрузка...</div>
+        <div className="text-ink-muted">Проверка авторизации...</div>
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   const startAdd = () => {

@@ -23,6 +23,42 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-export default function ProductLayout({ children }: { children: React.ReactNode }) {
-  return children;
+export default async function ProductLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  let jsonLd: any = null;
+  try {
+    const product = await prisma.product.findUnique({ where: { id } });
+    if (product) {
+      jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.name,
+        description: product.description,
+        offers: {
+          "@type": "Offer",
+          price: product.price,
+          priceCurrency: "RUB",
+          availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+        },
+      };
+    }
+  } catch {}
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      {children}
+    </>
+  );
 }
