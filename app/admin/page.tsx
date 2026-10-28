@@ -29,7 +29,7 @@ export default function AdminPage() {
     useCatalogStore();
   const { orders, addOrder, updateOrderStatus, deleteOrder } = useOrderStore();
   const { codes, addCode, updateCode, deleteCode } = usePromoStore();
-  const { banners, addBanner, updateBanner, deleteBanner } = usePromoBannerStore();
+  const { banners, addBanner, updateBanner, deleteBanner, fetchBanners } = usePromoBannerStore();
   const { collections, addCollection, updateCollection, deleteCollection } = useCollectionStore();
   const { entries: scentEntries, setScent, removeScent } = useScentCalendarStore();
   const { sets: giftSets, addSet: addGiftSet, updateSet: updateGiftSet, deleteSet: deleteGiftSet } = useGiftSetStore();
@@ -79,6 +79,7 @@ export default function AdminPage() {
       const { fetchOrders } = useOrderStore.getState();
       fetchProducts();
       fetchOrders();
+      fetchBanners();
       // Load messenger settings
       fetch("/api/settings/messenger").then((r) => r.json()).then((s) => {
         setTgToken(s.tgToken || "");
@@ -1727,7 +1728,7 @@ export default function AdminPage() {
                           if (data.products) localStorage.setItem("podnebesnaya-catalog", JSON.stringify(data.products));
                           if (data.orders) localStorage.setItem("podnebesnaya-orders", JSON.stringify(data.orders));
                           if (data.promos) localStorage.setItem("podnebesnaya-promos", JSON.stringify(data.promos));
-                          if (data.banners) localStorage.setItem("podnebesnaya-promo-banners", JSON.stringify(data.banners));
+                          if (data.banners) { for (const b of data.banners) { fetch("/api/banners", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) }); } }
                           if (data.categories) localStorage.setItem("podnebesnaya-categories", JSON.stringify(data.categories));
                           if (data.heroImage) localStorage.setItem("podnebesnaya-hero-image", JSON.stringify(data.heroImage));
                           alert("Данные успешно импортированы. Перезагрузите страницу.");

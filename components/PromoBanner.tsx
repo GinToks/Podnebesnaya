@@ -7,8 +7,11 @@ import { ChevronRight } from "lucide-react";
 
 export default function PromoBanner() {
   const [mounted, setMounted] = useState(false);
-  const { getActiveBanners } = usePromoBannerStore();
-  useEffect(() => setMounted(true), []);
+  const { getActiveBanners, fetchBanners } = usePromoBannerStore();
+  useEffect(() => {
+    setMounted(true);
+    fetchBanners();
+  }, [fetchBanners]);
   const banners = mounted ? getActiveBanners() : [];
 
   if (banners.length === 0) return null;

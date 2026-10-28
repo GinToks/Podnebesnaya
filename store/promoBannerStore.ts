@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 export interface PromoBanner {
   id: string;
@@ -17,41 +16,71 @@ export interface PromoBanner {
 
 interface PromoBannerState {
   banners: PromoBanner[];
-  addBanner: (banner: Omit<PromoBanner, "id">) => void;
-  updateBanner: (id: string, updates: Partial<PromoBanner>) => void;
-  deleteBanner: (id: string) => void;
+  isLoading: boolean;
+  fetchBanners: () => Promise<void>;
+  addBanner: (banner: Omit<PromoBanner, "id">) => Promise<void>;
+  updateBanner: (id: string, updates: Partial<PromoBanner>) => Promise<void>;
+  deleteBanner: (id: string) => Promise<void>;
   getActiveBanners: () => PromoBanner[];
 }
 
-export const usePromoBannerStore = create<PromoBannerState>()(
-  persist(
-    (set, get) => ({
-      banners: [
-        {
-          id: "pb-1",
-          title: "Весенняя коллекция",
-          subtitle: "Скидка 20% на все свечи с ароматом сакуры",
-          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          bgColor: "#E8B4B8",
-          textColor: "#3D2B1F",
-          active: true,
-          link: "#catalog",
-          linkText: "Смотреть",
-        },
-      ],
-      addBanner: (banner) => {
-        const id = `pb-${Date.now()}`;
-        set((state) => ({ banners: [...state.banners, { ...banner, id }] }));
-      },
-      updateBanner: (id, updates) =>
-        set((state) => ({
-          banners: state.banners.map((b) => (b.id === id ? { ...b, ...updates } : b)),
-        })),
-      deleteBanner: (id) =>
-        set((state) => ({ banners: state.banners.filter((b) => b.id !== id) })),
-      getActiveBanners: () =>
-        get().banners.filter((b) => b.active && new Date(b.endDate) > new Date()),
-    }),
-    { name: "podnebesnaya-promo-banners" }
-  )
-);
+export const usePromoBannerStore = create<PromoBannerState>()((set, get) => ({
+  banners: [],
+  isLoading: false,
+  fetchBanners: async () => {
+    set({ isLoading: true });
+    try {
+      const res = await fetch("/api/banners");
+      if (!res.ok) throw new Error("Failed to fetch banners");
+      const data = await res.json();
+      set({ banners: Array.isArray(data) ? data : [], isLoading: false });
+    } catch {
+      set({ isLoading: false });
+    }
+  },
+  addBanner: async (banner) => {
+    try {
+      const res = await fetch("/api/banners", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(banner),
+      });
+      if (!res.ok) throw new Error("Failed to create banner");
+      const created = await res.json();
+      set((state) => ({ banners: [...state.banners, created] }));
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  updateBanner: async (id, updates) => {
+    try {
+      const res = await fetch("/api/banners", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...updates }),
+      });
+      if (!res.ok) throw new Error("Failed to update banner");
+      const updated = await res.json();
+      set((state) => ({
+        banners: state.banners.map((b) => (b.id === id ? updated : b)),
+      }));
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  deleteBanner: async (id) => {
+    try {
+      const res = await fetch("/api/banners", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error("Failed to delete banner");
+      set((state) => ({ banners: state.banners.filter((b) => b.id !== id) }));
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  getActiveBanners: () =>
+    get().banners.filter((b) => b.active && new Date(b.endDate) > new Date()),
+}));
