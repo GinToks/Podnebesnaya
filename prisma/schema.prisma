@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,9 +17,9 @@ model Product {
   legend          String
   accent          String
   stock           Int
-  images          String   // JSON string
-  notes           String   // JSON string
-  offer           String?  // JSON string
+  images          String
+  notes           String
+  offer           String?
   originalPrice   Int?
   discountPercent Int?
   createdAt       DateTime @default(now())
@@ -31,7 +31,7 @@ model Order {
   customerName    String
   customerEmail   String
   customerAddress String
-  items           String   // JSON string
+  items           String
   totalPrice      Int
   status          String   @default("new")
   createdAt       DateTime @default(now())
