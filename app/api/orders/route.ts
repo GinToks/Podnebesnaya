@@ -79,25 +79,36 @@ export async function POST(req: NextRequest) {
   }
 
   // Notifications
+  let notificationSent = false;
+  let notificationError = "";
   try {
     await ensureMessengerSettingsTable();
     const row = await prisma.adminSetting.findUnique({ where: { key: "messenger_settings" } });
     let settings = { tgToken: "", tgChatId: "", waNumber: "" };
     if (row?.value) {
       try { settings = { ...settings, ...JSON.parse(row.value) }; } catch {}
+    } else {
+      notificationError = "Настройки не найдены в БД";
     }
 
     const itemsText = data.items.map((i: any) => `• ${i.productName} x${i.quantity} — ${i.price * i.quantity} ₽`).join("\n");
     const message = `🛒 Новый заказ ${order.id}\nКлиент: ${data.customerName}\nEmail: ${data.customerEmail}\nАдрес: ${data.customerAddress}\n\nТовары:\n${itemsText}\n\nИтого: ${data.totalPrice} ₽`;
 
     if (settings.tgToken && settings.tgChatId) {
-      await fetch(`https://api.telegram.org/bot${settings.tgToken}/sendMessage`, {
+      const tgRes = await fetch(`https://api.telegram.org/bot${settings.tgToken}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chat_id: settings.tgChatId, text: message }),
-      }).catch(() => {});
+      });
+      const tgData = await tgRes.json().catch(() => ({}));
+      if (tgData.ok) {
+        notificationSent = true;
+      } else {
+        notificationError = tgData.description || "Ошибка Telegram";
+        console.error("Telegram notify failed:", tgData);
+      }
 
-      if (lowStock.length > 0) {
+      if (notificationSent && lowStock.length > 0) {
         const alertText = `⚠️ Низкий остаток:\n${lowStock.map((p) => `• ${p.name}: ${p.stock} шт.`).join("\n")}`;
         await fetch(`https://api.telegram.org/bot${settings.tgToken}/sendMessage`, {
           method: "POST",
@@ -105,12 +116,15 @@ export async function POST(req: NextRequest) {
           body: JSON.stringify({ chat_id: settings.tgChatId, text: alertText }),
         }).catch(() => {});
       }
+    } else {
+      notificationError = notificationError || "Токен или Chat ID не настроены";
     }
+  } catch (e) {
+    notificationError = String(e);
+    console.error("Notification error:", e);
+  }
 
-    // WhatsApp: server-side auto-send not available without Cloud API; store link in response
-  } catch {}
-
-  return NextResponse.json(parseOrder(order), { status: 201 });
+  return NextResponse.json({ ...parseOrder(order), notification: { sent: notificationSent, error: notificationError } }, { status: 201 });
 }
 
 export async function PATCH(req: NextRequest) {

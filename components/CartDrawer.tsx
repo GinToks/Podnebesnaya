@@ -69,7 +69,7 @@ export default function CartDrawer() {
   const onSubmit = async (data: OrderForm) => {
     setSubmitting(true);
     // Create order
-    await addOrder({
+    const created = await addOrder({
       customerName: data.name,
       customerEmail: data.email,
       customerAddress: data.address,
@@ -81,13 +81,11 @@ export default function CartDrawer() {
       })),
       totalPrice: finalPrice,
     });
-    // Decrement stock
-    for (const item of items) {
-      const p = products.find((prod) => prod.id === item.product.id);
-      if (p) {
-        await updateProduct(p.id, { stock: Math.max(0, p.stock - item.quantity) });
-      }
+    if (created?.notification && !created.notification.sent) {
+      console.error("Order notification failed:", created.notification.error);
+      addToast({ type: "error", title: "Уведомление не отправлено", message: created.notification.error || "Неизвестная ошибка" });
     }
+    // Decrement stock handled server-side in /api/orders
     if (appliedPromo) {
       incrementUses(appliedPromo.code);
     }

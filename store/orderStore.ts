@@ -54,6 +54,10 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
     if (!res.ok) throw new Error("Failed to create order");
     const newOrder = await res.json();
     set((state) => ({ orders: [newOrder, ...state.orders] }));
+    if (newOrder.notification && !newOrder.notification.sent) {
+      console.error("Order notification failed:", newOrder.notification.error);
+    }
+    return newOrder;
   },
   updateOrderStatus: async (id, status) => {
     const res = await fetch("/api/orders", {
