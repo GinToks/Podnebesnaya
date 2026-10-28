@@ -58,6 +58,10 @@ export default function AdminPage() {
   const [scentProductId, setScentProductId] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [tgToken, setTgToken] = useState("");
+  const [tgChatId, setTgChatId] = useState("");
+  const [waNumber, setWaNumber] = useState("");
+  const [messengerStatus, setMessengerStatus] = useState("");
 
   useEffect(() => {
     checkAuth();
@@ -77,12 +81,9 @@ export default function AdminPage() {
       fetchOrders();
       // Load messenger settings
       fetch("/api/settings/messenger").then((r) => r.json()).then((s) => {
-        const t = document.getElementById("tg-token") as HTMLInputElement;
-        const c = document.getElementById("tg-chatid") as HTMLInputElement;
-        const w = document.getElementById("wa-number") as HTMLInputElement;
-        if (t) t.value = s.tgToken || "";
-        if (c) c.value = s.tgChatId || "";
-        if (w) w.value = s.waNumber || "";
+        setTgToken(s.tgToken || "");
+        setTgChatId(s.tgChatId || "");
+        setWaNumber(s.waNumber || "");
       }).catch(() => {});
     }
   }, [isAuthenticated]);
@@ -1834,37 +1835,63 @@ export default function AdminPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-medium text-ink-muted mb-1.5">Telegram Bot Token</label>
-                  <input id="tg-token" className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" />
+                  <input id="tg-token" value={tgToken} onChange={(e) => setTgToken(e.target.value)} className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-ink-muted mb-1.5">Telegram Chat ID</label>
-                  <input id="tg-chatid" className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" placeholder="-1001234567890" />
+                  <input id="tg-chatid" value={tgChatId} onChange={(e) => setTgChatId(e.target.value)} className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" placeholder="-1001234567890" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-ink-muted mb-1.5">WhatsApp номер</label>
-                  <input id="wa-number" className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" placeholder="+7 999 123-45-67" />
+                  <input id="wa-number" value={waNumber} onChange={(e) => setWaNumber(e.target.value)} className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" placeholder="+7 999 123-45-67" />
                 </div>
-                <button
-                  onClick={async () => {
-                    const tgToken = (document.getElementById("tg-token") as HTMLInputElement)?.value;
-                    const tgChatId = (document.getElementById("tg-chatid") as HTMLInputElement)?.value;
-                    const waNumber = (document.getElementById("wa-number") as HTMLInputElement)?.value;
-                    try {
-                      const res = await fetch("/api/settings/messenger", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ tgToken, tgChatId, waNumber }),
-                      });
-                      if (res.ok) alert("Настройки сохранены");
-                      else alert("Не удалось сохранить");
-                    } catch {
-                      alert("Ошибка сети");
-                    }
-                  }}
-                  className="px-5 py-2.5 rounded-full bg-accent text-bg text-xs font-medium tracking-wide uppercase hover:bg-accent-hover transition-colors"
-                >
-                  Сохранить настройки
-                </button>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await fetch("/api/settings/messenger", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ tgToken, tgChatId, waNumber }),
+                        });
+                        if (res.ok) alert("Настройки сохранены");
+                        else alert("Не удалось сохранить");
+                      } catch {
+                        alert("Ошибка сети");
+                      }
+                    }}
+                    className="px-5 py-2.5 rounded-full bg-accent text-bg text-xs font-medium tracking-wide uppercase hover:bg-accent-hover transition-colors"
+                  >
+                    Сохранить настройки
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setMessengerStatus("Проверка...");
+                      try {
+                        const res = await fetch("/api/settings/messenger/test", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ tgToken, tgChatId }),
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                          setMessengerStatus(`✅ ${data.message}`);
+                        } else {
+                          setMessengerStatus(`❌ ${data.error || "Ошибка"}`);
+                        }
+                      } catch {
+                        setMessengerStatus("❌ Ошибка сети");
+                      }
+                    }}
+                    className="px-5 py-2.5 rounded-full border border-accent text-accent text-xs font-medium tracking-wide uppercase hover:bg-accent hover:text-bg transition-colors"
+                  >
+                    Проверить подключение
+                  </button>
+                </div>
+                {messengerStatus && (
+                  <p className="text-sm text-ink-muted mt-2">{messengerStatus}</p>
+                )}
+
               </div>
             </div>
 
