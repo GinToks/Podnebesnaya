@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
@@ -15,6 +15,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 import CustomCursor from "@/components/CustomCursor";
 import BambooDecor from "@/components/BambooDecor";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import InitialLoader from "@/components/InitialLoader";
 
 const inter = Inter({
@@ -72,7 +73,9 @@ export default function RootLayout({
           <BambooDecor />
           <CustomCursor />
           <ExitIntentPopup />
-          <InitialLoader>{children}</InitialLoader>
+          <ErrorBoundary>
+            <InitialLoader>{children}</InitialLoader>
+          </ErrorBoundary>
           <Toast />
           </ThemeProvider>
           <script dangerouslySetInnerHTML={{ __html: "if (\"serviceWorker\" in navigator) { window.addEventListener(\"load\", () => { navigator.serviceWorker.register(\"/sw.js\"); }); }" }} />

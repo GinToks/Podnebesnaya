@@ -1,4 +1,4 @@
-﻿import { create } from "zustand";
+import { create } from "zustand";
 import { persist, devtools, createJSONStorage } from "zustand/middleware";
 import type { Product, ScentCategory } from "@/data/products";
 

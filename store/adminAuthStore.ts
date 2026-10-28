@@ -9,7 +9,7 @@ export interface AdminAuthState {
   getRemainingBlockTime: () => number;
 }
 
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || "admin123";
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION = 15 * 60 * 1000; // 15 minutes
 
