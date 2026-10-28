@@ -10,6 +10,13 @@ async function ensureMessengerSettingsTable() {
   } catch {}
 }
 
+async function ensureOrderColumns() {
+  try {
+    await prisma.$executeRawUnsafe(`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "phone" TEXT`);
+    await prisma.$executeRawUnsafe(`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "contactMethod" TEXT`);
+  } catch {}
+}
+
 
 export interface OrderItem {
   productId: string;
@@ -30,6 +37,7 @@ export interface Order {
 }
 
 export async function GET() {
+  await ensureOrderColumns();
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
   });
@@ -39,6 +47,7 @@ export async function GET() {
 function parseOrder(o: any) {
   return {
     ...o,
+    customerPhone: o.phone ?? o.customerPhone ?? null,
     items: JSON.parse(o.items),
     createdAt: o.createdAt.toISOString(),
   };
@@ -50,6 +59,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
+  await ensureOrderColumns();
   const data = parsed.data;
   const order = await prisma.order.create({
     data: {
@@ -57,6 +67,8 @@ export async function POST(req: NextRequest) {
       customerName: data.customerName,
       customerEmail: data.customerEmail,
       customerAddress: data.customerAddress,
+      phone: data.customerPhone,
+      contactMethod: data.contactMethod,
       items: JSON.stringify(data.items),
       totalPrice: data.totalPrice,
       status: "new",
@@ -93,7 +105,8 @@ export async function POST(req: NextRequest) {
     }
 
     const itemsText = data.items.map((i: any) => `• ${i.productName} x${i.quantity} — ${i.price * i.quantity} ₽`).join("\n");
-    const message = `🛒 Новый заказ ${order.id}\nКлиент: ${data.customerName}\nEmail: ${data.customerEmail}\nАдрес: ${data.customerAddress}\n\nТовары:\n${itemsText}\n\nИтого: ${data.totalPrice} ₽`;
+    const contactLabel = data.contactMethod === "whatsapp" ? "WhatsApp" : data.contactMethod === "max" ? "Max" : "Telegram";
+    const message = `🛒 Новый заказ ${order.id}\nКлиент: ${data.customerName}\nТелефон: ${data.customerPhone || "—"}\nСвязь: ${contactLabel}\nEmail: ${data.customerEmail}\nАдрес: ${data.customerAddress}\n\nТовары:\n${itemsText}\n\nИтого: ${data.totalPrice} ₽`;
 
     if (settings.tgToken && settings.tgChatId) {
       const tgRes = await fetch(`https://api.telegram.org/bot${settings.tgToken}/sendMessage`, {

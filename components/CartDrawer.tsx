@@ -14,6 +14,8 @@ import { z } from "zod";
 const orderSchema = z.object({
   name: z.string().min(2, "Укажите ваше имя"),
   email: z.string().email("Введите корректный email"),
+  phone: z.string().min(5, "Укажите телефон"),
+  contactMethod: z.enum(["telegram", "whatsapp", "max"]).default("telegram"),
   address: z.string().min(5, "Укажите адрес доставки"),
 });
 
@@ -54,7 +56,7 @@ export default function CartDrawer() {
 
   const form = useForm<OrderForm>({
     resolver: zodResolver(orderSchema),
-    defaultValues: { name: "", email: "", address: "" },
+    defaultValues: { name: "", email: "", phone: "", contactMethod: "telegram", address: "" },
   });
 
   const subtotal = totalPrice();
@@ -72,6 +74,8 @@ export default function CartDrawer() {
     const created = await addOrder({
       customerName: data.name,
       customerEmail: data.email,
+      customerPhone: data.phone,
+      contactMethod: data.contactMethod,
       customerAddress: data.address,
       items: items.map((i) => ({
         productId: i.product.id,
@@ -83,7 +87,6 @@ export default function CartDrawer() {
     });
     if (created?.notification && !created.notification.sent) {
       console.error("Order notification failed:", created.notification.error);
-      addToast({ type: "error", title: "Уведомление не отправлено", message: created.notification.error || "Неизвестная ошибка" });
     }
     // Decrement stock handled server-side in /api/orders
     if (appliedPromo) {
@@ -98,7 +101,7 @@ export default function CartDrawer() {
     addToast({
       type: "success",
       title: "Заказ оформлен",
-      message: `Спасибо, ${data.name}! Мы свяжемся с вами.${created?.notification?.sent ? " Уведомление отправлено (chat " + (created?.notification?.chatId || "?") + ")." : created?.notification?.error ? " (Уведомление: " + created.notification.error + ")" : ""}`,
+      message: `Спасибо, ${data.name}! Мы свяжемся с вами.`,
     });
   };
 
@@ -132,9 +135,19 @@ export default function CartDrawer() {
   return (
     <AnimatePresence>
       {isOpen ? (
-        <motion.aside
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
+        <>
+          <motion.div
+            key="cart-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={close}
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px]"
+          />
+          <motion.aside
+            key="cart-drawer"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "spring", damping: 28, stiffness: 220 }}
           className="fixed inset-y-0 right-0 z-50 w-full sm:max-w-[460px] bg-bg border-l border-mist shadow-2xl flex flex-col"
@@ -350,6 +363,35 @@ export default function CartDrawer() {
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-ink-muted mb-1">
+                        Телефон
+                      </label>
+                      <input
+                        {...form.register("phone")}
+                        className="w-full px-3 py-2 rounded bg-mist border border-mist text-sm text-ink focus:border-sky outline-none transition-colors placeholder:text-ink-muted"
+                        type="tel"
+                        placeholder="+7 900 000-00-00"
+                      />
+                      {form.formState.errors.phone && (
+                        <p className="text-xs text-accent mt-1">
+                          {form.formState.errors.phone.message}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-ink-muted mb-1">
+                        Где удобнее связаться
+                      </label>
+                      <select
+                        {...form.register("contactMethod")}
+                        className="w-full px-3 py-2 rounded bg-mist border border-mist text-sm text-ink focus:border-sky outline-none transition-colors"
+                      >
+                        <option value="telegram">Telegram</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="max">Max</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-ink-muted mb-1">
                         Адрес доставки
                       </label>
                       <input
@@ -386,6 +428,7 @@ export default function CartDrawer() {
             </p>
           </div>
         </motion.aside>
+        </>
       ) : null}
     </AnimatePresence>
   );

@@ -569,6 +569,8 @@ export default function AdminPage() {
                         <td className="px-4 py-4 text-ink-muted">
                           <p className="font-medium text-ink">{order.customerName}</p>
                           <p className="text-xs text-ink-muted">{order.customerEmail}</p>
+                          {order.customerPhone && <p className="text-xs text-ink-muted">📞 {order.customerPhone}</p>}
+                          {order.contactMethod && <p className="text-xs text-ink-muted">Связь: {order.contactMethod === "whatsapp" ? "WhatsApp" : order.contactMethod === "max" ? "Max" : "Telegram"}</p>}
                           <p className="text-xs text-ink-muted">{order.customerAddress}</p>
                         </td>
                         <td className="px-4 py-4 text-ink-muted">

@@ -32,6 +32,8 @@ export const productSchema = z.object({
 export const orderSchema = z.object({
   customerName: z.string().min(1, "Name is required"),
   customerEmail: z.string().email("Invalid email"),
+  customerPhone: z.string().min(5, "Phone is required"),
+  contactMethod: z.enum(["telegram", "whatsapp", "max"]).default("telegram"),
   customerAddress: z.string().min(1, "Address is required"),
   items: z.array(
     z.object({

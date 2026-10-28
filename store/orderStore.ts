@@ -12,6 +12,8 @@ export interface Order {
   id: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string;
+  contactMethod?: string;
   customerAddress: string;
   items: OrderItem[];
   totalPrice: number;
