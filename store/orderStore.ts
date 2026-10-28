@@ -38,14 +38,20 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
   error: null,
   fetchOrders: async () => {
     set({ isLoading: true, error: null });
-    try {
-      const res = await fetch("/api/orders");
-      if (!res.ok) throw new Error("Failed to fetch orders");
-      const orders = await res.json();
-      set({ orders, isLoading: false });
-    } catch (e) {
-      set({ error: (e as Error).message, isLoading: false });
+    let lastErr: any;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await fetch("/api/orders");
+        if (!res.ok) throw new Error("Failed to fetch orders");
+        const orders = await res.json();
+        set({ orders, isLoading: false });
+        return;
+      } catch (e) {
+        lastErr = e;
+        await new Promise((r) => setTimeout(r, 500 * (attempt + 1)));
+      }
     }
+    set({ error: (lastErr as Error)?.message || "Failed", isLoading: false });
   },
   addOrder: async (order) => {
     const res = await fetch("/api/orders", {
