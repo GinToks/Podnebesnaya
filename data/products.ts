@@ -24,6 +24,7 @@ export interface Product {
   fullDescription: string;
   notes: ScentNotes;
   price: number;
+  costPrice?: number;
   category: ScentCategory;
   legend: string;
   accent: string;

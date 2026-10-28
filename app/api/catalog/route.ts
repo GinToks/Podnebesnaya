@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { productSchema } from "@/lib/validations";
 
+async function ensureProductColumns() {
+  try {
+    await prisma.$executeRawUnsafe(`ALTER TABLE "Product" ADD COLUMN IF NOT EXISTS "costPrice" INTEGER`);
+  } catch {}
+}
+
 export async function GET() {
+  await ensureProductColumns();
   const products = await prisma.product.findMany({
     orderBy: { createdAt: "asc" },
   });
@@ -46,6 +53,7 @@ function parseProduct(p: any) {
 }
 
 export async function POST(req: NextRequest) {
+  await ensureProductColumns();
   const body = await req.json();
   const parsed = productSchema.safeParse(body);
   if (!parsed.success) {
@@ -60,6 +68,7 @@ export async function POST(req: NextRequest) {
       description: data.description,
       fullDescription: data.fullDescription,
       price: data.price,
+      costPrice: data.costPrice ?? null,
       category: data.category,
       legend: data.legend,
       accent: data.accent,
@@ -75,12 +84,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  await ensureProductColumns();
   const { id, ...patch } = await req.json();
   const data: any = {};
   if (patch.name !== undefined) data.name = patch.name;
   if (patch.description !== undefined) data.description = patch.description;
   if (patch.fullDescription !== undefined) data.fullDescription = patch.fullDescription;
   if (patch.price !== undefined) data.price = Number(patch.price);
+  if (patch.costPrice !== undefined) data.costPrice = patch.costPrice === null ? null : Number(patch.costPrice);
   if (patch.category !== undefined) data.category = patch.category;
   if (patch.legend !== undefined) data.legend = patch.legend;
   if (patch.accent !== undefined) data.accent = patch.accent;

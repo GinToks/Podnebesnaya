@@ -5,6 +5,7 @@ export const productSchema = z.object({
   description: z.string().min(1, "Description is required"),
   fullDescription: z.string().optional().default(""),
   price: z.number().min(0, "Price must be non-negative"),
+  costPrice: z.number().min(0).optional(),
   category: z.string().optional().default("fresh"),
   legend: z.string().optional().default(""),
   accent: z.string().optional().default("#C41E3A"),

@@ -13,6 +13,7 @@ model Product {
   description     String
   fullDescription String
   price           Int
+  costPrice       Int?
   category        String
   legend          String
   accent          String

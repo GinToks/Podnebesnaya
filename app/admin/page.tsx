@@ -127,6 +127,7 @@ export default function AdminPage() {
       fullDescription: draft.fullDescription ?? "",
       notes: (draft.notes as any) ?? { top: [], middle: [], base: [] },
       price: Number(draft.price) || 0,
+      costPrice: draft.costPrice ?? undefined,
       category: (draft.category as ScentCategory) || "fresh",
       legend: draft.legend ?? "",
       accent: draft.accent || "#C41E3A",
@@ -276,6 +277,22 @@ export default function AdminPage() {
                       onChange={(e) => setDraft({ ...draft, price: Number(e.target.value) || 0 })}
                       className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink focus:border-sky outline-none transition-colors"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-ink-muted mb-1.5">
+                      Себестоимость (₽)
+                    </label>
+                    <input
+                      type="number"
+                      value={draft.costPrice ?? ""}
+                      onChange={(e) => setDraft({ ...draft, costPrice: e.target.value === "" ? undefined : Number(e.target.value) })}
+                      className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink focus:border-sky outline-none transition-colors"
+                    />
+                    {draft.price && draft.costPrice != null && (
+                      <p className="text-xs text-ink-muted mt-1">
+                        Маржа: {Math.round(((draft.price - draft.costPrice) / draft.price) * 100)}%
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-ink-muted mb-1.5">
@@ -487,6 +504,11 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 py-4 text-ink-muted">
                           {product.price.toLocaleString("ru-RU")} ₽
+                          {product.costPrice != null && (
+                            <div className="text-[10px] text-ink-muted/70">
+                              себест. {product.costPrice.toLocaleString("ru-RU")} ₽ · маржа {Math.round(((product.price - product.costPrice) / product.price) * 100)}%
+                            </div>
+                          )}
                         </td>
                         <td className="px-4 py-4 text-ink-muted">
                           {product.stock}
