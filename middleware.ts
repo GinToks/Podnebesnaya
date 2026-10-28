@@ -29,7 +29,8 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  if (pathname.startsWith("/api/orders") && req.method !== "GET") {
+  // Protect admin order mutations (PATCH/DELETE) but allow public order creation (POST)
+  if (pathname.startsWith("/api/orders") && (req.method === "PATCH" || req.method === "DELETE")) {
     const token = req.cookies.get(COOKIE_NAME)?.value;
     if (!token || !(await verifyToken(token))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
