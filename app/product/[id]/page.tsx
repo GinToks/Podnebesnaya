@@ -86,6 +86,20 @@ export default function ProductDetailPage() {
           }),
         }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Главная", item: "https://podnebesnaya.ru/" },
+              { "@type": "ListItem", position: 2, name: "Каталог", item: "https://podnebesnaya.ru/#catalog" },
+              { "@type": "ListItem", position: 3, name: product.name, item: `https://podnebesnaya.ru/product/${product.id}` },
+            ],
+          }),
+        }}
+      />
       <section className="py-20 sm:py-28 lg:py-36 relative z-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Link
