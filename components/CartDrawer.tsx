@@ -95,7 +95,7 @@ export default function CartDrawer() {
     addToast({
       type: "success",
       title: "Заказ оформлен",
-      message: `Спасибо, ${data.name}! Мы свяжемся с вами.`,
+      message: `Спасибо, ${data.name}! Мы свяжемся с вами.${created?.notification?.sent ? " Уведомление отправлено." : created?.notification?.error ? " (Уведомление: " + created.notification.error + ")" : ""}`,
     });
   };
 
