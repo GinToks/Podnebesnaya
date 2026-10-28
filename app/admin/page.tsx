@@ -247,7 +247,17 @@ export default function AdminPage() {
                 <p className="text-sm text-ink-muted mt-1">
                   Редактируйте товары, цены и промо-предложения. Изменения видны на сайте сразу.
                 </p>
-              </div>
+              {products.some((p) => (p.stock ?? 0) <= 3) && (
+                <div className="mt-3 p-3 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 text-sm">
+                  <p className="font-medium mb-1">⚠️ Низкий остаток:</p>
+                  <ul className="list-disc list-inside text-xs">
+                    {products.filter((p) => (p.stock ?? 0) <= 3).map((p) => (
+                      <li key={p.id}>{p.name} — {p.stock ?? 0} шт.</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
               <div className="flex items-center gap-2">
                 <SearchBarAdmin value={adminSearch} onChange={setAdminSearch} />
                 <button
