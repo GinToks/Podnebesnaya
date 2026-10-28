@@ -52,3 +52,13 @@ model GiftCard {
   balance       Int
   createdAt     DateTime @default(now())
 }
+
+
+model Review {
+  id          String   @id @default(cuid())
+  productId   String
+  authorName  String
+  rating      Int
+  text        String
+  createdAt   DateTime @default(now())
+}

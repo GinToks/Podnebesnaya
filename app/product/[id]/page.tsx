@@ -9,6 +9,7 @@ import Link from "next/link";
 import ProductGallery from "@/components/ProductGallery";
 import BreathingCandle from "@/components/BreathingCandle";
 import RelatedProducts from "@/components/RelatedProducts";
+import ReviewsBlock from "@/components/ReviewsBlock";
 import type { Product } from "@/data/products";
 
 export default function ProductDetailPage() {
@@ -210,6 +211,10 @@ export default function ProductDetailPage() {
               ))}
             </div>
           </div>
+        </div>
+        <div className="mt-12">
+          <h3 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4">Отзывы</h3>
+          <ReviewsBlock productId={String(product.id)} />
         </div>
         <RelatedProducts products={products} excludeId={product.id} />
       </div>
