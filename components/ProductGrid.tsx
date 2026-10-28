@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Filter, X } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import QuickViewModal from "@/components/QuickViewModal";
+import Skeleton from "@/components/Skeleton";
 import SearchBar from "@/components/SearchBar";
 import PriceRangeFilter from "@/components/PriceRangeFilter";
 import { useCategoryStore } from "@/store/categoryStore";
@@ -16,6 +17,7 @@ export default function ProductGrid() {
   const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
   const categories = useCategoryStore((state) => state.categories);
   const storeProducts = useCatalogStore((state) => state.products);
+  const isLoading = useCatalogStore((state) => state.isLoading);
   const seed = useCatalogStore((state) => state.fetchProducts);
   const products: Product[] = Array.isArray(storeProducts) ? storeProducts : [];
   const [category, setCategory] = useState<string>("all");
@@ -190,6 +192,17 @@ export default function ProductGrid() {
           </button>
         )}
 
+        {isLoading && products.length === 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="rounded-xl border border-mist p-3">
+                <Skeleton className="aspect-square mb-2" />
+                <Skeleton className="h-4 w-3/4 mb-1" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {filtered.map((product) => (
             <ProductCard
@@ -204,6 +217,7 @@ export default function ProductGrid() {
             </div>
           )}
         </div>
+        )}
 
         <QuickViewModal
           isOpen={!!quickViewProduct}
