@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createToken, COOKIE_NAME, MAX_AGE } from "@/lib/auth";
 import { getStoredPassword } from "@/lib/adminPassword";
+import { prisma } from "@/lib/prisma";
+import { verifyTotp } from "@/lib/totp";
+
+async function ensureTable() {
+  try {
+    await prisma.$executeRawUnsafe(
+      `CREATE TABLE IF NOT EXISTS "AdminSetting" ("key" TEXT NOT NULL PRIMARY KEY, "value" TEXT NOT NULL, "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP)`
+    );
+  } catch {}
+}
+
+async function getTotpSecret(): Promise<string | null> {
+  await ensureTable();
+  const row = await prisma.adminSetting.findUnique({ where: { key: "admin_totp_secret" } });
+  return row?.value || null;
+}
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION = 15 * 60 * 1000;
@@ -28,6 +44,13 @@ export async function POST(req: NextRequest) {
 
   const stored = await getStoredPassword();
   if (password === stored) {
+    const secret = await getTotpSecret();
+    if (secret) {
+      const code = body.code || "";
+      if (!code || !verifyTotp(secret, code)) {
+        return NextResponse.json({ success: false, requires2fa: true, error: "Неверный код 2FA" }, { status: 401 });
+      }
+    }
     attempts.delete(ip);
     const token = await createToken();
     const res = NextResponse.json({ success: true });

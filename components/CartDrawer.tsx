@@ -102,6 +102,21 @@ export default function CartDrawer() {
     if (created?.notification && !created.notification.sent) {
       console.error("Order notification failed:", created.notification.error);
     }
+    // Online payment
+    try {
+      const payRes = await fetch("/api/payment/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: payablePrice, orderId: created.id, description: `Заказ ${created.id}` }),
+      });
+      if (payRes.ok) {
+        const payData = await payRes.json();
+        if (payData.confirmationUrl) {
+          window.location.href = payData.confirmationUrl;
+          return;
+        }
+      }
+    } catch {}
     // Decrement stock handled server-side in /api/orders
     if (appliedPromo) {
       incrementUses(appliedPromo.code);
