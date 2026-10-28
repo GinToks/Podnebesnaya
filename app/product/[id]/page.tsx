@@ -65,7 +65,27 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <section className="py-20 sm:py-28 lg:py-36 relative z-10">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.name,
+            description: product.description,
+            image: (product.images || []).map((i: any) => i.url).filter(Boolean),
+            offers: {
+              "@type": "Offer",
+              price: product.price,
+              priceCurrency: "RUB",
+              availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+              url: `https://podnebesnaya.vercel.app/product/${product.id}`,
+            },
+          }),
+        }}
+      />
+      <section className="py-20 sm:py-28 lg:py-36 relative z-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Link
           href="/#catalog"
@@ -194,5 +214,6 @@ export default function ProductDetailPage() {
         <RelatedProducts products={products} excludeId={product.id} />
       </div>
     </section>
+    </>
   );
 }

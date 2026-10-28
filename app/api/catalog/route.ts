@@ -40,7 +40,9 @@ export async function GET() {
     return NextResponse.json(seeded.map(parseProduct));
   }
 
-  return NextResponse.json(products.map(parseProduct));
+  return NextResponse.json(products.map(parseProduct), {
+    headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
+  });
 }
 
 function parseProduct(p: any) {
