@@ -28,6 +28,12 @@ export default function AdminPage() {
   const { products, addProduct, updateProduct, deleteProduct, fetchProducts: seed, reorderProducts } =
     useCatalogStore();
   const { orders, addOrder, updateOrderStatus, deleteOrder } = useOrderStore();
+  const filteredOrders = orders.filter((o) => {
+    const q = orderSearch.toLowerCase();
+    const matchesSearch = !q || o.id.toLowerCase().includes(q) || o.customerName.toLowerCase().includes(q) || o.customerEmail.toLowerCase().includes(q) || (o.customerPhone || "").toLowerCase().includes(q);
+    const matchesStatus = orderStatusFilter === "all" || o.status === orderStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
   const { codes, addCode, updateCode, deleteCode } = usePromoStore();
   const { banners, addBanner, updateBanner, deleteBanner, fetchBanners } = usePromoBannerStore();
   const { collections, addCollection, updateCollection, deleteCollection } = useCollectionStore();
@@ -65,6 +71,8 @@ export default function AdminPage() {
   const [gcAmount, setGcAmount] = useState("");
   const [gcCode, setGcCode] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [orderSearch, setOrderSearch] = useState("");
+  const [orderStatusFilter, setOrderStatusFilter] = useState("all");
   const [messengerStatus, setMessengerStatus] = useState("");
 
   useEffect(() => {
@@ -569,6 +577,25 @@ export default function AdminPage() {
             </div>
 
             <div className="rounded-xl border border-mist bg-bg overflow-x-auto shadow-sm">
+              <div className="p-3 flex flex-col sm:flex-row gap-3 border-b border-mist">
+                <input
+                  value={orderSearch}
+                  onChange={(e) => setOrderSearch(e.target.value)}
+                  placeholder="Поиск по номеру, имени, email, телефону"
+                  className="flex-1 px-3 py-2 rounded bg-mist border border-mist text-sm text-ink"
+                />
+                <select
+                  value={orderStatusFilter}
+                  onChange={(e) => setOrderStatusFilter(e.target.value)}
+                  className="px-3 py-2 rounded bg-mist border border-mist text-sm text-ink"
+                >
+                  <option value="all">Все статусы</option>
+                  <option value="new">Новый</option>
+                  <option value="processing">В обработке</option>
+                  <option value="completed">Выполнен</option>
+                  <option value="cancelled">Отменён</option>
+                </select>
+              </div>
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-mist bg-mist">
@@ -580,14 +607,14 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-mist/50">
-                  {orders.length === 0 ? (
+                  {filteredOrders.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="px-4 py-8 text-center text-ink-muted text-sm">
                         Заказов пока нет.
                       </td>
                     </tr>
                   ) : (
-                    orders.map((order) => (
+                    filteredOrders.map((order) => (
                       <tr key={order.id} className="hover:bg-mist/30 transition-colors group">
                         <td className="px-4 py-4">
                           <p className="font-medium text-ink">{order.id}</p>
