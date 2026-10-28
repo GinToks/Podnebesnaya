@@ -2,9 +2,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, ShoppingCart, Heart } from "lucide-react";
+import { Menu, X, ShoppingCart, Heart, Shield } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
 import WishlistModal from "@/components/WishlistModal";
 
 const navLinks = [
@@ -22,6 +23,7 @@ export default function Header() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
+  const isAdmin = useAdminAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
     setMounted(true);
@@ -89,13 +91,23 @@ export default function Header() {
                   {mounted ? count : 0}
                 </span>
               </button>
+              {mounted && isAdmin && (
+                <Link
+                  href="/admin"
+                  className="flex items-center gap-2 p-2 rounded-full hover:bg-mist transition-colors text-accent"
+                  aria-label="Админ-панель"
+                >
+                  <Shield size={18} strokeWidth={2} />
+                  <span className="hidden md:block text-xs font-semibold">Админ</span>
+                </Link>
+              )}
             </nav>
             <button
               className="md:hidden p-2 rounded-full hover:bg-mist transition-colors"
-              onClick={() => setMobileOpen(true)}
-              aria-label="Открыть меню"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню"}
             >
-              <Menu size={20} strokeWidth={2} />
+              {mobileOpen ? <X size={20} strokeWidth={2} /> : <Menu size={20} strokeWidth={2} />}
             </button>
           </div>
         </div>

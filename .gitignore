@@ -42,3 +42,4 @@ yarn-error.log*
 dev.db
 *.db
 prisma/dev.db
+data/admin-password.txt

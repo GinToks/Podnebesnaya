@@ -74,6 +74,14 @@ export default function AdminPage() {
     }
   }, [isAuthenticated]);
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg">
+        <div className="text-ink-muted">Загрузка...</div>
+      </div>
+    );
+  }
+
   const startAdd = () => {
     setEditingId("new");
     setDraft({
@@ -1832,6 +1840,60 @@ export default function AdminPage() {
                   className="px-5 py-2.5 rounded-full bg-accent text-bg text-xs font-medium tracking-wide uppercase hover:bg-accent-hover transition-colors"
                 >
                   Сохранить настройки
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-8 p-6 bg-bg-elevated border border-mist rounded-xl shadow-sm">
+              <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4">
+                Смена пароля администратора
+              </h2>
+              <p className="text-sm text-ink-muted mb-4">
+                Измените пароль для входа в админ-панель.
+              </p>
+              <div className="space-y-4 max-w-md">
+                <div>
+                  <label className="block text-xs font-medium text-ink-muted mb-1.5">Текущий пароль</label>
+                  <input id="cp-current" type="password" className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-ink-muted mb-1.5">Новый пароль</label>
+                  <input id="cp-new" type="password" className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-ink-muted mb-1.5">Подтвердите новый пароль</label>
+                  <input id="cp-confirm" type="password" className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" />
+                </div>
+                <button
+                  onClick={async () => {
+                    const current = (document.getElementById("cp-current") as HTMLInputElement)?.value;
+                    const newPass = (document.getElementById("cp-new") as HTMLInputElement)?.value;
+                    const confirm = (document.getElementById("cp-confirm") as HTMLInputElement)?.value;
+                    if (!current || !newPass || !confirm) { alert("Заполните все поля"); return; }
+                    if (newPass !== confirm) { alert("Пароли не совпадают"); return; }
+                    if (newPass.length < 6) { alert("Пароль должен быть не менее 6 символов"); return; }
+                    try {
+                      const res = await fetch("/api/auth/change-password", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ currentPassword: current, newPassword: newPass }),
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        alert("Пароль успешно изменён");
+                        (document.getElementById("cp-current") as HTMLInputElement).value = "";
+                        (document.getElementById("cp-new") as HTMLInputElement).value = "";
+                        (document.getElementById("cp-confirm") as HTMLInputElement).value = "";
+                      } else {
+                        alert(data.error || "Ошибка смены пароля");
+                      }
+                    } catch {
+                      alert("Ошибка сети");
+                    }
+                  }}
+                  className="px-5 py-2.5 rounded-full bg-accent text-bg text-xs font-medium tracking-wide uppercase hover:bg-accent-hover transition-colors"
+                >
+                  Сменить пароль
                 </button>
               </div>
             </div>

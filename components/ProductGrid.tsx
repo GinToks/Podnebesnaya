@@ -97,7 +97,7 @@ export default function ProductGrid() {
               Уникальные композиции, созданные в духе Поднебесной.
             </p>
           </div>
-          <div className="flex flex-wrap gap-4 sm:flex-nowrap items-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap items-start sm:items-center">
             <SearchBar value={search} onChange={setSearch} />
             <div className="flex flex-wrap gap-2">
               <span className="text-xs font-medium text-ink-muted self-center">Цена:</span>

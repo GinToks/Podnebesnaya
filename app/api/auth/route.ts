@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+const PASSWORD_FILE = path.join(process.cwd(), "data", "admin-password.txt");
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION = 15 * 60 * 1000;
+
+function getStoredPassword(): string {
+  try {
+    if (fs.existsSync(PASSWORD_FILE)) {
+      return fs.readFileSync(PASSWORD_FILE, "utf-8").trim();
+    }
+  } catch {}
+  return ADMIN_PASSWORD;
+}
 
 // Simple in-memory rate limiting (per-process; use Redis in production)
 const attempts = new Map<string, { count: number; blockedUntil: number }>();
@@ -26,7 +38,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const password = body.password || "";
 
-  if (password === ADMIN_PASSWORD) {
+  if (password === getStoredPassword()) {
     attempts.delete(ip);
     return NextResponse.json({ success: true });
   }
