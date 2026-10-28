@@ -3,7 +3,7 @@ import { create } from "zustand";
 export interface AdminAuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (password: string) => Promise<boolean>;
+  login: (password: string, code?: string) => Promise<"ok" | "2fa" | "fail">;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -11,21 +11,22 @@ export interface AdminAuthState {
 export const useAdminAuthStore = create<AdminAuthState>()((set) => ({
   isAuthenticated: false,
   isLoading: true,
-  login: async (password) => {
+  login: async (password, code) => {
     try {
       const res = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, code }),
       });
       const data = await res.json();
       if (data.success) {
         set({ isAuthenticated: true });
-        return true;
+        return "ok";
       }
-      return false;
+      if (data.requires2fa) return "2fa";
+      return "fail";
     } catch {
-      return false;
+      return "fail";
     }
   },
   logout: async () => {
