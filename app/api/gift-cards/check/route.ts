@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
+  if (!rateLimit(getRateLimitKey(req, "giftcard-check"), 20, 60000)) {
+    return NextResponse.json({ error: "Слишком много запросов" }, { status: 429 });
+  }
   const body = await req.json();
   const code = String(body.code || "").trim();
   if (!code) return NextResponse.json({ error: "Code required" }, { status: 400 });

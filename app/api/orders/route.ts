@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { orderSchema, orderStatusSchema } from "@/lib/validations";
+import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 
 async function ensureMessengerSettingsTable() {
   try {
@@ -55,6 +56,9 @@ function parseOrder(o: any) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!rateLimit(getRateLimitKey(req, "orders"), 10, 60000)) {
+    return NextResponse.json({ error: "Слишком много запросов" }, { status: 429 });
+  }
   const body = await req.json();
   const parsed = orderSchema.safeParse(body);
   if (!parsed.success) {
