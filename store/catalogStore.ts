@@ -59,16 +59,25 @@ export const useCatalogStore = create<CatalogState>()(
       set((state) => ({ products: [...state.products, newProduct] }));
     },
     updateProduct: async (id, patch) => {
-      const res = await fetch("/api/catalog", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, ...patch }),
-      });
-      if (!res.ok) throw new Error("Failed to update product");
-      const updated = await res.json();
+      const prev = get().products;
       set((state) => ({
-        products: state.products.map((p) => (p.id === id ? updated : p)),
+        products: state.products.map((p) => (p.id === id ? { ...p, ...patch } : p)),
       }));
+      try {
+        const res = await fetch("/api/catalog", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, ...patch }),
+        });
+        if (!res.ok) throw new Error("Failed to update product");
+        const updated = await res.json();
+        set((state) => ({
+          products: state.products.map((p) => (p.id === id ? updated : p)),
+        }));
+      } catch (e) {
+        set({ products: prev });
+        throw e;
+      }
     },
     deleteProduct: async (id) => {
       const res = await fetch("/api/catalog", {
