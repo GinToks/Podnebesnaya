@@ -81,10 +81,11 @@ export async function POST(req: NextRequest) {
   // Notifications
   let notificationSent = false;
   let notificationError = "";
+  let settings = { tgToken: "", tgChatId: "", waNumber: "" };
   try {
     await ensureMessengerSettingsTable();
     const row = await prisma.adminSetting.findUnique({ where: { key: "messenger_settings" } });
-    let settings = { tgToken: "", tgChatId: "", waNumber: "" };
+    settings = { tgToken: "", tgChatId: "", waNumber: "" };
     if (row?.value) {
       try { settings = { ...settings, ...JSON.parse(row.value) }; } catch {}
     } else {
@@ -124,7 +125,7 @@ export async function POST(req: NextRequest) {
     console.error("Notification error:", e);
   }
 
-  return NextResponse.json({ ...parseOrder(order), notification: { sent: notificationSent, error: notificationError } }, { status: 201 });
+  return NextResponse.json({ ...parseOrder(order), notification: { sent: notificationSent, error: notificationError, chatId: settings.tgChatId } }, { status: 201 });
 }
 
 export async function PATCH(req: NextRequest) {
