@@ -212,7 +212,7 @@ export default function AdminPage() {
                   Управление каталогом
                 </h1>
                 <p className="text-sm text-ink-muted mt-1">
-                  Редактируйте товары, цены и промо-предложения. РР·РјРµРЅРµРЅРёСЏ видны на сайте сразу.
+                  Редактируйте товары, цены и промо-предложения. Изменения видны на сайте сразу.
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -354,7 +354,7 @@ export default function AdminPage() {
                           className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors"
                         />
                         <p className="text-[10px] text-ink-muted mt-1">
-                          Выберите файл изображения (JPG, PNG, WebP). РР·РѕР±СЂР°Р¶РµРЅРёРµ будет сохранено в браузере.
+                          Выберите файл изображения (JPG, PNG, WebP). Изображение будет сохранено в браузере.
                         </p>
                       </div>
                     </div>
@@ -1667,7 +1667,7 @@ export default function AdminPage() {
                 Бэкап и восстановление
               </h2>
               <p className="text-sm text-ink-muted mb-4">
-                Экспорт всех данных (товары, заказы, промокоды, баннеры, категории) в JSON-файл. РРјРїРѕСЂС‚ из файла восстановит данные.
+                Экспорт всех данных (товары, заказы, промокоды, баннеры, категории) в JSON-файл. Импорт из файла восстановит данные.
               </p>
               <div className="flex gap-3">
                 <button
@@ -1694,7 +1694,7 @@ export default function AdminPage() {
                   Экспорт данных
                 </button>
                 <label className="px-5 py-2.5 rounded-full border border-accent text-accent text-xs font-medium tracking-wide uppercase hover:bg-accent hover:text-bg transition-colors cursor-pointer">
-                  РРјРїРѕСЂС‚ данных
+                  Импорт данных
                   <input
                     type="file"
                     accept=".json"
@@ -1756,7 +1756,7 @@ export default function AdminPage() {
 
             <div className="mb-8 p-6 bg-bg-elevated border border-mist rounded-xl shadow-sm">
               <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4">
-                РР·РѕР±СЂР°Р¶РµРЅРёРµ Hero-секции
+                Изображение Hero-секции
               </h2>
               <p className="text-sm text-ink-muted mt-1">
                 Управление изображением в Hero-секции и другими настройками.
@@ -1765,7 +1765,7 @@ export default function AdminPage() {
 
             <div className="mb-8 p-6 bg-bg-elevated border border-mist rounded-xl shadow-sm">
               <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4">
-                РР·РѕР±СЂР°Р¶РµРЅРёРµ Hero-секции
+                Изображение Hero-секции
               </h2>
               <div className="flex flex-col md:flex-row gap-6 items-start">
                 <div className="w-full md:w-64 h-40 rounded-xl overflow-hidden border border-mist bg-mist flex items-center justify-center">
@@ -1795,7 +1795,7 @@ export default function AdminPage() {
                       className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors"
                     />
                     <p className="text-[10px] text-ink-muted mt-1">
-                      Выберите файл изображения (JPG, PNG, WebP). РР·РѕР±СЂР°Р¶РµРЅРёРµ будет сохранено в браузере.
+                      Выберите файл изображения (JPG, PNG, WebP). Изображение будет сохранено в браузере.
                     </p>
                   </div>
                   <button
@@ -1811,7 +1811,7 @@ export default function AdminPage() {
 
             <div className="mb-8 p-6 bg-bg-elevated border border-mist rounded-xl shadow-sm">
               <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4">
-                РРЅС‚РµРіСЂР°С†РёСЏ с мессенджерами
+                Интеграция с мессенджерами
               </h2>
               <p className="text-sm text-ink-muted mb-4">
                 Настройте уведомления о новых заказах в Telegram и WhatsApp.
