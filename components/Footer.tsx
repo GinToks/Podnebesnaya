@@ -23,7 +23,7 @@ export default function Footer() {
               Авторские ароматические свечи
             </p>
           </div>
-          <nav className="flex gap-6 text-sm text-ink-muted">
+          <nav className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm text-ink-muted">
             <Link href="#" className="hover:text-accent transition-colors">
               О нас
             </Link>
@@ -46,7 +46,7 @@ export default function Footer() {
             </a>
           </div>
         </div>
-        <div className="mt-12 border-t border-mist pt-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="mt-12 border-t border-mist pt-8 flex flex-col md:flex-row md:items-center justify-between gap-4 text-center md:text-left">
           <p className="text-xs text-ink-muted">
             © Поднебесная. Все права защищены.
           </p>

@@ -117,17 +117,17 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               transition={{ delay: 0.35, duration: 0.8 }}
               viewport={{ once: true }}
-              className="flex items-center gap-3"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
             >
               <Link
                 href="#catalog"
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-olive text-bg text-sm font-medium tracking-wide uppercase rounded-full hover:bg-olive-hover transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-3.5 bg-olive text-bg text-sm font-medium tracking-wide uppercase rounded-full hover:bg-olive-hover transition-colors"
               >
                 Открыть коллекцию <ChevronRight size={16} />
               </Link>
               <button
                 onClick={toggle}
-                className="flex items-center gap-2 px-6 py-3.5 border border-sakura text-ink text-sm font-medium tracking-wide rounded-full hover:bg-sakura/20 transition-colors"
+                className="flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 border border-sakura text-ink text-sm font-medium tracking-wide rounded-full hover:bg-sakura/20 transition-colors"
               >
                 Корзина
                 <span className={`text-[10px] ${mounted && cartCount === 0 ? "hidden" : "inline-block"}`}>
@@ -136,7 +136,7 @@ export default function Hero() {
               </button>
               <button
                 onClick={() => setQuizOpen(true)}
-                className="flex items-center gap-2 px-6 py-3.5 border border-olive text-ink text-sm font-medium tracking-wide rounded-full hover:bg-olive/10 transition-colors"
+                className="flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 border border-olive text-ink text-sm font-medium tracking-wide rounded-full hover:bg-olive/10 transition-colors"
               >
                 Подобрать аромат
               </button>
