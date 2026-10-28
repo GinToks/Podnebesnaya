@@ -1845,6 +1845,43 @@ export default function AdminPage() {
 
             <div className="mb-8 p-6 bg-bg-elevated border border-mist rounded-xl shadow-sm">
               <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4">
+                Двухфакторная аутентификация (2FA)
+              </h2>
+              <p className="text-sm text-ink-muted mb-4">
+                Защитите админку кодом из приложения-аутентификатора (Google Authenticator, Authy).
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={async () => {
+                    const res = await fetch("/api/auth/2fa", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "setup" }) });
+                    const data = await res.json();
+                    if (data.secret) {
+                      const code = prompt(`Секрет: ${data.secret}\nURL: ${data.url}\n\nВведите код из приложения для подтверждения:`);
+                      if (code) {
+                        const v = await fetch("/api/auth/2fa", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "verify", code }) });
+                        if (v.ok) alert("2FA включена"); else alert("Неверный код");
+                      }
+                    } else alert("Ошибка");
+                  }}
+                  className="px-5 py-2.5 rounded-full bg-accent text-bg text-xs font-medium tracking-wide uppercase"
+                >
+                  Включить 2FA
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!confirm("Отключить 2FA?")) return;
+                    await fetch("/api/auth/2fa", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "disable" }) });
+                    alert("2FA отключена");
+                  }}
+                  className="px-5 py-2.5 rounded-full border border-mist text-ink text-xs font-medium tracking-wide uppercase"
+                >
+                  Отключить 2FA
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-8 p-6 bg-bg-elevated border border-mist rounded-xl shadow-sm">
+              <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4">
                 Бэкап и восстановление
               </h2>
               <p className="text-sm text-ink-muted mb-4">
