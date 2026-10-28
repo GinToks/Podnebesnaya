@@ -33,6 +33,7 @@ export const useAdminAuthStore = create<AdminAuthState>()((set) => ({
       await fetch("/api/auth/logout", { method: "POST" });
     } catch {}
     set({ isAuthenticated: false });
+    window.location.href = "/admin/login";
   },
   checkAuth: async () => {
     try {

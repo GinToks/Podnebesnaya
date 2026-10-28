@@ -1,21 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import { createToken, COOKIE_NAME, MAX_AGE } from "@/lib/auth";
+import { getStoredPassword } from "@/lib/adminPassword";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
-const PASSWORD_FILE = path.join(process.cwd(), "data", "admin-password.txt");
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION = 15 * 60 * 1000;
-
-function getStoredPassword(): string {
-  try {
-    if (fs.existsSync(PASSWORD_FILE)) {
-      return fs.readFileSync(PASSWORD_FILE, "utf-8").trim();
-    }
-  } catch {}
-  return ADMIN_PASSWORD;
-}
 
 const attempts = new Map<string, { count: number; blockedUntil: number }>();
 
@@ -38,7 +26,8 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const password = body.password || "";
 
-  if (password === getStoredPassword()) {
+  const stored = await getStoredPassword();
+  if (password === stored) {
     attempts.delete(ip);
     const token = await createToken();
     const res = NextResponse.json({ success: true });

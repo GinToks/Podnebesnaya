@@ -167,7 +167,6 @@ export default function AdminPage() {
             <Link
               href="/"
               className="hover:accent-text transition-colors"
-              onClick={() => logout()}
             >
               На сайт <ArrowLeft size={16} strokeWidth={2} />
             </Link>
@@ -183,7 +182,7 @@ export default function AdminPage() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center gap-4 mb-8">
-          <div className="flex-1 flex gap-2 border-b border-mist pb-2">
+          <div className="flex-1 flex gap-2 border-b border-mist pb-2 overflow-x-auto">
             {[
               { key: "catalog", label: "Каталог" },
               { key: "orders", label: "Заказы" },
@@ -443,7 +442,7 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div className="rounded-xl border border-mist bg-bg overflow-hidden shadow-sm">
+            <div className="rounded-xl border border-mist bg-bg overflow-x-auto shadow-sm">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-mist bg-mist">
@@ -530,7 +529,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-mist bg-bg overflow-hidden shadow-sm">
+            <div className="rounded-xl border border-mist bg-bg overflow-x-auto shadow-sm">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-mist bg-mist">
@@ -733,7 +732,7 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div className="rounded-xl border border-mist bg-bg overflow-hidden shadow-sm">
+            <div className="rounded-xl border border-mist bg-bg overflow-x-auto shadow-sm">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-mist bg-mist">

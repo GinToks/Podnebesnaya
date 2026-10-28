@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Inter, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
@@ -35,6 +35,13 @@ const notoSerifSc = Noto_Serif_SC({
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || "G-XXXXXXXXXX";
 const YANDEX_METRICA_ID = process.env.NEXT_PUBLIC_YANDEX_METRICA_ID || "XXXXXXXX";
 const VK_PIXEL_ID = process.env.NEXT_PUBLIC_VK_PIXEL_ID || "VK-RTRG-XXXXXX-XXXX";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#F0F5EC",
+};
 
 export const metadata: Metadata = {
   title: "\u041f\u043e\u0434\u043d\u0435\u0431\u0435\u0441\u043d\u0430\u044f \u2014 \u0430\u0432\u0442\u043e\u0440\u0441\u043a\u0438\u0435 \u0430\u0440\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0435 \u0441\u0432\u0435\u0447\u0438",

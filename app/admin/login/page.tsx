@@ -15,7 +15,7 @@ export default function AdminLoginPage() {
     event.preventDefault();
     const result = await login(password);
     if (result) {
-      router.push("/admin");
+      window.location.href = "/admin";
     } else {
       setError(true);
       setTimeout(() => setError(false), 3000);

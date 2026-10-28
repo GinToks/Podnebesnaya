@@ -1,6 +1,15 @@
 @import "tailwindcss";
 
 @theme {
+  /* Responsive breakpoints for fine-grained control across devices */
+  --breakpoint-xs: 475px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  --breakpoint-3xl: 1920px;
+
   /* Japanese aesthetic: warm cream paper, dark brown, olive, sakura pink, bamboo green */
   --color-bg: #F0F5EC;
   --color-bg-elevated: #FAF7F2;

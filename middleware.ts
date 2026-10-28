@@ -36,9 +36,16 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  if (pathname.startsWith("/api/auth/change-password")) {
+    const token = req.cookies.get(COOKIE_NAME)?.value;
+    if (!token || !(await verifyToken(token))) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/catalog", "/api/orders", "/api/auth/change-password"],
+  matcher: ["/admin", "/admin/:path*", "/api/catalog", "/api/orders", "/api/auth/change-password"],
 };

@@ -36,3 +36,9 @@ model Order {
   status          String   @default("new")
   createdAt       DateTime @default(now())
 }
+
+model AdminSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
