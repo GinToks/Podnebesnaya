@@ -90,6 +90,9 @@ export default function CartDrawer() {
       incrementUses(appliedPromo.code);
     }
     clear();
+    form.reset();
+    setPromoCode("");
+    setAppliedPromo(null);
     setSubmitted(true);
     setSubmitting(false);
     addToast({
