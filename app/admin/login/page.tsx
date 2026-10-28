@@ -7,20 +7,15 @@ import { Shield, Lock } from "lucide-react";
 
 export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
-  const [needs2fa, setNeeds2fa] = useState(false);
   const [error, setError] = useState(false);
   const login = useAdminAuthStore((state) => state.login);
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const result = await login(password, needs2fa ? code : undefined);
-    if (result === "ok") {
+    const result = await login(password);
+    if (result) {
       window.location.href = "/admin";
-    } else if (result === "2fa") {
-      setNeeds2fa(true);
-      setError(false);
     } else {
       setError(true);
       setTimeout(() => setError(false), 3000);
@@ -56,23 +51,8 @@ export default function AdminLoginPage() {
               autoComplete="current-password"
             />
           </div>
-          {needs2fa && (
-            <div>
-              <label className="block text-xs font-medium text-ink/80 mb-1.5">
-                Код 2FA
-              </label>
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="w-full px-4 py-3 rounded bg-mist border border-mist text-ink focus:border-sky outline-none transition-colors placeholder:text-ink/50"
-                placeholder="123456"
-                autoComplete="one-time-code"
-              />
-            </div>
-          )}
           {error && (
-            <p className="text-xs text-accent">Неверный пароль или код</p>
+            <p className="text-xs text-accent">Неверный пароль</p>
           )}
           <button
             type="submit"
