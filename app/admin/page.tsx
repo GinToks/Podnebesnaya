@@ -1680,13 +1680,12 @@ export default function AdminPage() {
                 <button
                   onClick={() => {
                     const data = {
-                      products: JSON.parse(localStorage.getItem("podnebesnaya-catalog") || "{}"),
-                      orders: JSON.parse(localStorage.getItem("podnebesnaya-orders") || "{}"),
-                      promos: JSON.parse(localStorage.getItem("podnebesnaya-promos") || "{}"),
-                      banners: JSON.parse(localStorage.getItem("podnebesnaya-promo-banners") || "{}"),
-                      categories: JSON.parse(localStorage.getItem("podnebesnaya-categories") || "{}"),
-                      heroImage: JSON.parse(localStorage.getItem("podnebesnaya-hero-image") || "{}"),
-                      cart: JSON.parse(localStorage.getItem("podnebesnaya-cart") || "{}"),
+                      products: products,
+                      orders: orders,
+                      promos: codes,
+                      banners: banners,
+                      categories: categories,
+                      heroImage: heroImageUrl,
                     };
                     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
                     const url = URL.createObjectURL(blob);
