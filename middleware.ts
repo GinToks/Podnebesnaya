@@ -44,6 +44,15 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // CSRF check for mutating requests
+  if (pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD") {
+    const origin = req.headers.get("origin");
+    const host = req.headers.get("host");
+    if (origin && host && !origin.includes(host)) {
+      return NextResponse.json({ error: "CSRF blocked" }, { status: 403 });
+    }
+  }
+
   return NextResponse.next();
 }
 
