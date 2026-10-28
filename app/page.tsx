@@ -14,12 +14,11 @@ import Footer from "@/components/Footer";
 import { useCatalogStore } from "@/store/catalogStore";
 
 export default function HomePage() {
-  const { seed, applyLowStockPromo } = useCatalogStore();
+  const { fetchProducts, applyLowStockPromo } = useCatalogStore();
 
   useEffect(() => {
-    seed();
-    applyLowStockPromo();
-  }, [seed, applyLowStockPromo]);
+    fetchProducts();
+  }, [fetchProducts]);
 
   return (
     <div className="relative z-10">

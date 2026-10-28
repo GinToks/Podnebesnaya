@@ -8,7 +8,7 @@ import { useCatalogStore } from "@/store/catalogStore";
 
 export default function ScentCalendar() {
   const { getScent } = useScentCalendarStore();
-  const { products, seed } = useCatalogStore();
+  const { products, fetchProducts: seed } = useCatalogStore();
   useEffect(() => { seed(); }, [seed]);
 
   const today = new Date().toISOString().slice(0, 10);

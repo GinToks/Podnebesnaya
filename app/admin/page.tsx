@@ -25,7 +25,7 @@ type AdminTab = "catalog" | "orders" | "promos" | "banners" | "collections" | "c
 export default function AdminPage() {
   const { isAuthenticated, logout } = useAdminAuthStore();
   const router = useRouter();
-  const { products, addProduct, updateProduct, deleteProduct, seed, reorderProducts } =
+  const { products, addProduct, updateProduct, deleteProduct, fetchProducts: seed, reorderProducts } =
     useCatalogStore();
   const { orders, addOrder, updateOrderStatus, deleteOrder } = useOrderStore();
   const { codes, addCode, updateCode, deleteCode } = usePromoStore();
@@ -65,6 +65,15 @@ export default function AdminPage() {
     }
   }, [isAuthenticated, router]);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      const { fetchProducts } = useCatalogStore.getState();
+      const { fetchOrders } = useOrderStore.getState();
+      fetchProducts();
+      fetchOrders();
+    }
+  }, [isAuthenticated]);
+
   const startAdd = () => {
     setEditingId("new");
     setDraft({
@@ -82,7 +91,7 @@ export default function AdminPage() {
     setNewOfferLabel(product.offer?.label ?? "");
   };
 
-  const saveDraft = () => {
+  const saveDraft = async () => {
     if (!draft.name || !draft.description || draft.price == null) return;
     const product: Product = {
       id: draft.id ?? "",
@@ -101,18 +110,18 @@ export default function AdminPage() {
       discountPercent: draft.discountPercent,
     };
     if (editingId) {
-      updateProduct(editingId, product);
+      await updateProduct(editingId, product);
     } else {
-      addProduct(product as Omit<Product, "id">);
+      await addProduct(product as Omit<Product, "id">);
     }
     setEditingId(null);
     setDraft({});
     setNewOfferLabel("");
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("Удалить товар без возможности восстановления?")) {
-      deleteProduct(id);
+      await deleteProduct(id);
     }
   };
 
@@ -413,7 +422,7 @@ export default function AdminPage() {
             {selectedProducts.length > 0 && (
               <div className="mb-4 p-4 bg-mist/50 border border-mist rounded-xl flex flex-wrap items-center gap-3">
                 <span className="text-sm font-medium text-ink">Выбрано: {selectedProducts.length}</span>
-                <button onClick={() => { selectedProducts.forEach((id) => deleteProduct(id)); setSelectedProducts([]); }} className="px-4 py-1.5 rounded-full bg-accent text-bg text-xs font-medium uppercase hover:bg-accent-hover transition-colors">Удалить выбранные</button>
+                <button onClick={async () => { for (const id of selectedProducts) { await deleteProduct(id); } setSelectedProducts([]); }} className="px-4 py-1.5 rounded-full bg-accent text-bg text-xs font-medium uppercase hover:bg-accent-hover transition-colors">Удалить выбранные</button>
                 <button onClick={() => setSelectedProducts([])} className="px-4 py-1.5 rounded-full border border-mist text-ink text-xs font-medium uppercase hover:bg-mist transition-colors">Снять выделение</button>
               </div>
             )}
@@ -542,12 +551,12 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 py-4">
                           <select
-                            value={order.status}
-                            onChange={(e) =>
-                              updateOrderStatus(order.id, e.target.value as any)
-                            }
-                            className="px-2 py-1 rounded bg-mist border border-mist text-[11px] text-ink outline-none focus:border-sky"
-                          >
+                                                      value={order.status}
+                                                      onChange={async (e) =>
+                                                        await updateOrderStatus(order.id, e.target.value as any)
+                                                      }
+                                                      className="px-2 py-1 rounded bg-mist border border-mist text-[11px] text-ink outline-none focus:border-sky"
+                                                    >
                             {["new", "processing", "completed", "cancelled"].map((s) => (
                               <option key={s} value={s}>
                                 {statusLabels[s]}
@@ -557,7 +566,7 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 py-4 text-right">
                           <button
-                            onClick={() => deleteOrder(order.id)}
+                            onClick={async () => await deleteOrder(order.id)}
                             className="text-xs text-accent hover:underline"
                             title="Удалить заказ"
                           >
@@ -1104,7 +1113,7 @@ export default function AdminPage() {
 
               <div className="mt-4 flex gap-3">
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     const title = (document.getElementById("banner-title") as HTMLInputElement)?.value;
                     const subtitle = (document.getElementById("banner-subtitle") as HTMLInputElement)?.value;
                     const endDate = (document.getElementById("banner-enddate") as HTMLInputElement)?.value;
@@ -1126,14 +1135,14 @@ export default function AdminPage() {
                       });
                       // Update product offers
                       if (discount > 0) {
-                        checked.forEach((pid) => {
+                        for (const pid of checked) {
                           const product = products.find((p) => p.id === pid);
                           if (product) {
                             const origPrice = product.originalPrice || product.price;
                             const newPrice = Math.round(origPrice * (1 - discount / 100));
-                            updateProduct(pid, { offer: { label: `-${discount}%`, active: true }, originalPrice: origPrice, price: newPrice });
+                            await updateProduct(pid, { offer: { label: `-${discount}%`, active: true }, originalPrice: origPrice, price: newPrice });
                           }
-                        });
+                        }
                       }
                       setEditingBannerId(null);
                     } else {
@@ -1151,14 +1160,14 @@ export default function AdminPage() {
                         linkText: "Смотреть",
                       });
                       if (discount > 0) {
-                        checked.forEach((pid) => {
+                        for (const pid of checked) {
                           const product = products.find((p) => p.id === pid);
                           if (product) {
                             const origPrice = product.originalPrice || product.price;
                             const newPrice = Math.round(origPrice * (1 - discount / 100));
-                            updateProduct(pid, { offer: { label: `-${discount}%`, active: true }, originalPrice: origPrice, price: newPrice });
+                            await updateProduct(pid, { offer: { label: `-${discount}%`, active: true }, originalPrice: origPrice, price: newPrice });
                           }
-                        });
+                        }
                       }
                     }
                     (document.getElementById("banner-title") as HTMLInputElement).value = "";
@@ -1228,23 +1237,23 @@ export default function AdminPage() {
                         Редактировать
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (banner.active && banner.selectedProductIds && banner.discount && banner.discount > 0) {
-                            banner.selectedProductIds.forEach((pid) => {
+                            for (const pid of banner.selectedProductIds) {
                               const product = products.find((p) => p.id === pid);
                               if (product && product.originalPrice) {
-                                updateProduct(pid, { price: product.originalPrice, originalPrice: undefined, offer: undefined, discountPercent: undefined });
+                                await updateProduct(pid, { price: product.originalPrice, originalPrice: undefined, offer: undefined, discountPercent: undefined });
                               }
-                            });
+                            }
                           } else if (!banner.active && banner.selectedProductIds && banner.discount && banner.discount > 0) {
-                            banner.selectedProductIds.forEach((pid) => {
+                            for (const pid of banner.selectedProductIds) {
                               const product = products.find((p) => p.id === pid);
                               if (product) {
                                 const origPrice = product.originalPrice || product.price;
                                 const newPrice = Math.round(origPrice * (1 - (banner.discount || 0) / 100));
-                                updateProduct(pid, { offer: { label: `-${banner.discount}%`, active: true }, originalPrice: origPrice, price: newPrice, discountPercent: banner.discount });
+                                await updateProduct(pid, { offer: { label: `-${banner.discount}%`, active: true }, originalPrice: origPrice, price: newPrice, discountPercent: banner.discount });
                               }
-                            });
+                            }
                           }
                           updateBanner(banner.id, { active: !banner.active });
                         }}
@@ -1253,16 +1262,16 @@ export default function AdminPage() {
                         {banner.active ? "Отключить" : "Включить"}
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (window.confirm("Удалить баннер?")) {
                             // Restore original prices for products in this banner
                             if (banner.selectedProductIds && banner.discount && banner.discount > 0) {
-                              banner.selectedProductIds.forEach((pid) => {
+                              for (const pid of banner.selectedProductIds) {
                                 const product = products.find((p) => p.id === pid);
                                 if (product && product.originalPrice) {
-                                  updateProduct(pid, { price: product.originalPrice, originalPrice: undefined, offer: undefined });
+                                  await updateProduct(pid, { price: product.originalPrice, originalPrice: undefined, offer: undefined });
                                 }
-                              });
+                              }
                             }
                             deleteBanner(banner.id);
                           }

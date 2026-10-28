@@ -69,7 +69,7 @@ export default function CartDrawer() {
   const onSubmit = async (data: OrderForm) => {
     setSubmitting(true);
     // Create order
-    addOrder({
+    await addOrder({
       customerName: data.name,
       customerEmail: data.email,
       customerAddress: data.address,
@@ -82,12 +82,12 @@ export default function CartDrawer() {
       totalPrice: finalPrice,
     });
     // Decrement stock
-    items.forEach((item) => {
+    for (const item of items) {
       const p = products.find((prod) => prod.id === item.product.id);
       if (p) {
-        updateProduct(p.id, { stock: Math.max(0, p.stock - item.quantity) });
+        await updateProduct(p.id, { stock: Math.max(0, p.stock - item.quantity) });
       }
-    });
+    }
     if (appliedPromo) {
       incrementUses(appliedPromo.code);
     }

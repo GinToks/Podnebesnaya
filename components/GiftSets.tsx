@@ -11,7 +11,7 @@ import type { Product } from "@/data/products";
 
 export default function GiftSets() {
   const { sets, getActiveSets } = useGiftSetStore();
-  const { seed: seedCatalog } = useCatalogStore();
+  const { fetchProducts: seedCatalog } = useCatalogStore();
   const { addItem } = useCartStore();
   const { addToast } = useToastStore();
   useEffect(() => { seedCatalog(); }, [seedCatalog]);

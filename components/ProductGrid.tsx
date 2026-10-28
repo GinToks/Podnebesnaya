@@ -16,7 +16,7 @@ export default function ProductGrid() {
   const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
   const categories = useCategoryStore((state) => state.categories);
   const storeProducts = useCatalogStore((state) => state.products);
-  const seed = useCatalogStore((state) => state.seed);
+  const seed = useCatalogStore((state) => state.fetchProducts);
   const products: Product[] = Array.isArray(storeProducts) ? storeProducts : [];
   const [category, setCategory] = useState<string>("all");
   const [sort, setSort] = useState<"price-asc" | "price-desc" | "name">("name");

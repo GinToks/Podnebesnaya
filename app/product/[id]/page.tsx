@@ -13,7 +13,7 @@ import type { Product } from "@/data/products";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const { products, getProduct } = useCatalogStore();
+  const { products, getProduct, fetchProducts } = useCatalogStore();
   const { addItem } = useCartStore();
 
   const [quantity, setQuantity] = useState(1);
@@ -29,6 +29,10 @@ export default function ProductDetailPage() {
       setMainImage({ id: "default", url: "", alt: product.name });
     }
   }, [product?.id, product]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   if (!products.length) {
     return null;

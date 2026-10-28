@@ -5,7 +5,7 @@ import { usePromoStore } from "@/store/promoStore";
 import { promoCodes } from "@/data/products";
 
 export default function ToastProvider({ children }: { children: React.ReactNode }) {
-  const { seed } = useCatalogStore();
+  const { fetchProducts: seed } = useCatalogStore();
   const { codes, addCode } = usePromoStore();
 
   useEffect(() => {

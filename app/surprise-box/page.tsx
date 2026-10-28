@@ -16,15 +16,14 @@ const SURPRISE_PRICE = 9900;
 const INDIVIDUAL_ESTIMATE = 13500;
 
 export default function SurpriseBoxPage() {
-  const { products, seed, applyLowStockPromo } = useCatalogStore();
+  const { products, fetchProducts } = useCatalogStore();
   const { addItem, open } = useCartStore();
   const { addToast } = useToastStore();
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
-    seed();
-    applyLowStockPromo();
-  }, [seed, applyLowStockPromo]);
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleBuy = () => {
     const pool = products.filter((p: Product) => (p.stock ?? 0) > 0);

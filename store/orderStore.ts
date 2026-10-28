@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type { Product } from "@/data/products";
 
 export interface OrderItem {
@@ -22,45 +21,60 @@ export interface Order {
 
 interface OrderState {
   orders: Order[];
-  addOrder: (order: Omit<Order, "id" | "createdAt" | "status">) => void;
-  updateOrderStatus: (id: string, status: Order["status"]) => void;
-  deleteOrder: (id: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchOrders: () => Promise<void>;
+  addOrder: (order: Omit<Order, "id" | "createdAt" | "status">) => Promise<void>;
+  updateOrderStatus: (id: string, status: Order["status"]) => Promise<void>;
+  deleteOrder: (id: string) => Promise<void>;
   getOrder: (id: string) => Order | undefined;
 }
 
-const generateId = () => `ORD-${Math.random().toString(36).slice(2, 9).toUpperCase()}`;
-
-export const useOrderStore = create<OrderState>()(
-  persist(
-    (set, get) => ({
-      orders: [],
-      addOrder: (order) =>
-        set((state) => ({
-          orders: [
-            {
-              ...order,
-              id: generateId(),
-              status: "new",
-              createdAt: new Date().toISOString(),
-            },
-            ...state.orders,
-          ],
-        })),
-      updateOrderStatus: (id, status) =>
-        set((state) => ({
-          orders: state.orders.map((o: Order) =>
-            o.id === id ? { ...o, status } : o
-          ),
-        })),
-      deleteOrder: (id) =>
-        set((state) => ({
-          orders: state.orders.filter((o: Order) => o.id !== id),
-        })),
-      getOrder: (id) => {
-        const s = get();
-        return s.orders.find((o: Order) => o.id === id);
-      },
-    }),
-    { name: "podnebesnaya-orders" }
-  )
-);
+export const useOrderStore = create<OrderState>()((set, get) => ({
+  orders: [],
+  isLoading: false,
+  error: null,
+  fetchOrders: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch("/api/orders");
+      if (!res.ok) throw new Error("Failed to fetch orders");
+      const orders = await res.json();
+      set({ orders, isLoading: false });
+    } catch (e) {
+      set({ error: (e as Error).message, isLoading: false });
+    }
+  },
+  addOrder: async (order) => {
+    const res = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(order),
+    });
+    if (!res.ok) throw new Error("Failed to create order");
+    const newOrder = await res.json();
+    set((state) => ({ orders: [newOrder, ...state.orders] }));
+  },
+  updateOrderStatus: async (id, status) => {
+    const res = await fetch("/api/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status }),
+    });
+    if (!res.ok) throw new Error("Failed to update order");
+    const updated = await res.json();
+    set((state) => ({
+      orders: state.orders.map((o) => (o.id === id ? updated : o)),
+    }));
+  },
+  deleteOrder: async (id) => {
+    const res = await fetch("/api/orders", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (!res.ok) throw new Error("Failed to delete order");
+    set((state) => ({ orders: state.orders.filter((o) => o.id !== id) }));
+  },
+  getOrder: (id) => get().orders.find((o) => o.id === id),
+}));

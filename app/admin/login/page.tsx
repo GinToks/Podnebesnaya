@@ -13,14 +13,10 @@ export default function AdminLoginPage() {
   const getRemainingBlockTime = useAdminAuthStore((state) => state.getRemainingBlockTime);
   const router = useRouter();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (isBlocked()) {
-      setError(true);
-      setTimeout(() => setError(false), 3000);
-      return;
-    }
-    if (login(password)) {
+    const result = await login(password);
+    if (result) {
       router.push("/admin");
     } else {
       setError(true);
