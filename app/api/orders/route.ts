@@ -14,6 +14,7 @@ async function ensureOrderColumns() {
   try {
     await prisma.$executeRawUnsafe(`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "phone" TEXT`);
     await prisma.$executeRawUnsafe(`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "contactMethod" TEXT`);
+    await prisma.$executeRawUnsafe(`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "trackingNumber" TEXT`);
   } catch {}
 }
 
@@ -148,9 +149,11 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
   const { id, status } = parsed.data;
+  const data: any = { status };
+  if (body.trackingNumber !== undefined) data.trackingNumber = body.trackingNumber || null;
   const order = await prisma.order.update({
     where: { id },
-    data: { status },
+    data,
   });
   return NextResponse.json(parseOrder(order));
 }

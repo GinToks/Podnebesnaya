@@ -64,6 +64,13 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  metadataBase: new URL("https://podnebesnaya.ru"),
+  alternates: {
+    canonical: "/",
+    languages: {
+      "ru-RU": "/",
+    },
+  },
   manifest: "/manifest.json",
 };
 

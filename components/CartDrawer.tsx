@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ShoppingCart, Trash2, ArrowRight, Check, Flame, Tag, Loader2, Gift } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
@@ -36,7 +36,20 @@ export default function CartDrawer() {
   const [appliedGiftCard, setAppliedGiftCard] = useState<{ code: string; amount: number } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [cartTimer, setCartTimer] = useState<number | null>(null);
+  const abandonedSent = useRef(false);
   const [giftWrap, setGiftWrap] = useState(false);
+  useEffect(() => {
+    if (cartTimer === 0 && items.length > 0 && !abandonedSent.current) {
+      abandonedSent.current = true;
+      fetch("/api/cart/abandoned", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: items.map((i) => ({ productName: i.product.name, quantity: i.quantity })) }),
+      }).catch(() => {});
+    }
+    if (items.length === 0) abandonedSent.current = false;
+  }, [cartTimer, items.length]);
+
   useEffect(() => {
     if (items.length > 0 && !cartTimer) {
       setCartTimer(15 * 60); // 15 minutes

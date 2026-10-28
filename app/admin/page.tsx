@@ -738,6 +738,32 @@ export default function AdminPage() {
                   <p className="text-xs text-ink-muted uppercase tracking-wider mb-1">Статус</p>
                   <p className="text-ink">{statusLabels[selectedOrder.status]}</p>
                 </div>
+                <div>
+                  <p className="text-xs text-ink-muted uppercase tracking-wider mb-1">Трек-номер</p>
+                  <div className="flex gap-2">
+                    <input
+                      defaultValue={selectedOrder.trackingNumber || ""}
+                      id="tracking-input"
+                      className="flex-1 px-3 py-2 rounded bg-mist border border-mist text-sm text-ink"
+                      placeholder="Введите трек-номер"
+                    />
+                    <button
+                      onClick={async () => {
+                        const val = (document.getElementById("tracking-input") as HTMLInputElement)?.value;
+                        await updateOrderStatus(selectedOrder.id, selectedOrder.status);
+                        await fetch("/api/orders", {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ id: selectedOrder.id, status: selectedOrder.status, trackingNumber: val }),
+                        });
+                        setSelectedOrder({ ...selectedOrder, trackingNumber: val });
+                      }}
+                      className="px-4 py-2 rounded bg-accent text-bg text-xs font-medium"
+                    >
+                      Сохранить
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
