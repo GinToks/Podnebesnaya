@@ -32,15 +32,21 @@ export const useCatalogStore = create<CatalogState>()(
     setProducts: (products) => set({ products }),
     fetchProducts: async () => {
       set({ isLoading: true, error: null });
-      try {
-        const res = await fetch("/api/catalog");
-        if (!res.ok) throw new Error("Failed to fetch catalog");
-        const products = await res.json();
-        set({ products, isLoading: false });
-        get().applyLowStockPromo();
-      } catch (e) {
-        set({ error: (e as Error).message, isLoading: false });
+      let lastErr: any;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const res = await fetch("/api/catalog");
+          if (!res.ok) throw new Error("Failed to fetch catalog");
+          const products = await res.json();
+          set({ products, isLoading: false });
+          get().applyLowStockPromo();
+          return;
+        } catch (e) {
+          lastErr = e;
+          await new Promise((r) => setTimeout(r, 500 * (attempt + 1)));
+        }
       }
+      set({ error: (lastErr as Error)?.message || "Failed", isLoading: false });
     },
     addProduct: async (product) => {
       const res = await fetch("/api/catalog", {
