@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, ShoppingCart, Heart, Shield } from "lucide-react";
+import { Menu, X, ShoppingCart, Heart, Shield, ArrowLeft } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
@@ -24,6 +25,8 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const isAdmin = useAdminAuthStore((state) => state.isAuthenticated);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useEffect(() => {
     setMounted(true);
@@ -48,15 +51,24 @@ export default function Header() {
               </span>
             </div>
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide uppercase text-ink-muted">
-              {navLinks.map((link, index) => (
+              {isHome ? (
+                navLinks.map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    className="hover:text-accent transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))
+              ) : (
                 <Link
-                  key={index}
-                  href={link.href}
-                  className="hover:text-accent transition-colors"
+                  href="/"
+                  className="hover:text-accent transition-colors flex items-center gap-1"
                 >
-                  {link.label}
+                  <ArrowLeft size={16} strokeWidth={2} /> На главную
                 </Link>
-              ))}
+              )}
               <button
                 onClick={() => setWishlistOpen(true)}
                 className="flex items-center gap-2 relative p-2 rounded-full hover:bg-mist transition-colors"
@@ -121,16 +133,26 @@ export default function Header() {
             >
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
                 <div className="flex flex-col gap-4 border-t border-mist pt-6">
-                  {navLinks.map((link, index) => (
+                  {isHome ? (
+                    navLinks.map((link, index) => (
+                      <Link
+                        key={index}
+                        href={link.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="block py-3 text-sm font-medium tracking-wide uppercase text-ink hover:text-accent transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    ))
+                  ) : (
                     <Link
-                      key={index}
-                      href={link.href}
+                      href="/"
                       onClick={() => setMobileOpen(false)}
-                      className="block py-3 text-sm font-medium tracking-wide uppercase text-ink hover:text-accent transition-colors"
+                      className="block py-3 text-sm font-medium tracking-wide uppercase text-ink hover:text-accent transition-colors flex items-center gap-2"
                     >
-                      {link.label}
+                      <ArrowLeft size={16} strokeWidth={2} /> На главную
                     </Link>
-                  ))}
+                  )}
                   <button
                     onClick={() => { setMobileOpen(false); setWishlistOpen(true); }}
                     className="block py-3 text-sm font-medium tracking-wide uppercase text-ink hover:text-accent transition-colors flex items-center justify-between w-full text-left"
