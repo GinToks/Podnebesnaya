@@ -45,3 +45,10 @@ model AdminSetting {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+model GiftCard {
+  code          String   @id
+  initialAmount Int
+  balance       Int
+  createdAt     DateTime @default(now())
+}

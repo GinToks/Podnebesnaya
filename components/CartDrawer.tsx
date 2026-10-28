@@ -31,6 +31,9 @@ export default function CartDrawer() {
   const [submitted, setSubmitted] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number; type: "percent" | "fixed" } | null>(null);
+  const [giftCardCode, setGiftCardCode] = useState("");
+  const [giftCardBalance, setGiftCardBalance] = useState<number | null>(null);
+  const [appliedGiftCard, setAppliedGiftCard] = useState<{ code: string; amount: number } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [cartTimer, setCartTimer] = useState<number | null>(null);
   const [giftWrap, setGiftWrap] = useState(false);
@@ -67,6 +70,8 @@ export default function CartDrawer() {
       : Math.max(0, subtotal - appliedPromo.discount)
     : subtotal;
   const finalPrice = discountedPrice + giftWrapCost;
+  const giftCardDiscount = appliedGiftCard ? Math.min(appliedGiftCard.amount, finalPrice) : 0;
+  const payablePrice = Math.max(0, finalPrice - giftCardDiscount);
 
   const onSubmit = async (data: OrderForm) => {
     setSubmitting(true);
@@ -83,8 +88,17 @@ export default function CartDrawer() {
         quantity: i.quantity,
         price: i.product.price,
       })),
-      totalPrice: finalPrice,
+      totalPrice: payablePrice,
     });
+    if (appliedGiftCard) {
+      try {
+        await fetch("/api/gift-cards/redeem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: appliedGiftCard.code, amount: giftCardDiscount }),
+        });
+      } catch {}
+    }
     if (created?.notification && !created.notification.sent) {
       console.error("Order notification failed:", created.notification.error);
     }
@@ -96,6 +110,9 @@ export default function CartDrawer() {
     form.reset();
     setPromoCode("");
     setAppliedPromo(null);
+    setGiftCardCode("");
+    setGiftCardBalance(null);
+    setAppliedGiftCard(null);
     setSubmitted(true);
     setSubmitting(false);
     addToast({
@@ -327,8 +344,38 @@ export default function CartDrawer() {
                   )}
                   <div className="flex justify-between mb-6 text-base font-medium text-ink">
                     <span>К оплате</span>
-                    <span>{finalPrice.toLocaleString("ru-RU")} ₽</span>
+                    <span>{payablePrice.toLocaleString("ru-RU")} ₽</span>
                   </div>
+                  <div className="mb-4 flex gap-2">
+                    <input
+                      value={giftCardCode}
+                      onChange={(e) => setGiftCardCode(e.target.value)}
+                      placeholder="Подарочная карта (код)"
+                      className="flex-1 px-3 py-2 rounded bg-mist border border-mist text-sm text-ink"
+                    />
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const code = giftCardCode.trim();
+                        if (!code) return;
+                        const res = await fetch("/api/gift-cards/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
+                        const data = await res.json();
+                        if (!data.valid) { addToast({ type: "error", title: "Карта", message: data.error || "Недействительна" }); return; }
+                        setGiftCardBalance(data.balance);
+                        setAppliedGiftCard({ code: data.code, amount: data.balance });
+                        addToast({ type: "success", title: "Карта применена", message: `Баланс ${data.balance} ₽` });
+                      }}
+                      className="px-4 py-2 rounded bg-accent text-bg text-xs font-medium"
+                    >
+                      Применить
+                    </button>
+                  </div>
+                  {appliedGiftCard && (
+                    <div className="flex justify-between mb-4 text-sm text-accent font-medium">
+                      <span>Подарочная карта ({appliedGiftCard.code})</span>
+                      <span>-{giftCardDiscount.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  )}
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                     <div>
                       <label className="block text-xs font-medium text-ink-muted mb-1">

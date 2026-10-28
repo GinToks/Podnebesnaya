@@ -20,7 +20,7 @@ import { Plus, Trash2, Save, X, ShieldOff, ArrowLeft, Check, Tag, Scroll, List, 
 import { motion, AnimatePresence } from "framer-motion";
 import type { Product, ScentCategory } from "@/data/products";
 
-type AdminTab = "catalog" | "orders" | "promos" | "banners" | "collections" | "categories" | "quiz" | "analytics" | "settings" | "scent-calendar" | "gift-sets";
+type AdminTab = "catalog" | "orders" | "promos" | "banners" | "collections" | "categories" | "quiz" | "analytics" | "settings" | "scent-calendar" | "gift-sets" | "giftcards";
 
 export default function AdminPage() {
   const { isAuthenticated, isLoading, logout, checkAuth } = useAdminAuthStore();
@@ -61,6 +61,10 @@ export default function AdminPage() {
   const [tgToken, setTgToken] = useState("");
   const [tgChatId, setTgChatId] = useState("");
   const [waNumber, setWaNumber] = useState("");
+  const [giftCards, setGiftCards] = useState<any[]>([]);
+  const [gcAmount, setGcAmount] = useState("");
+  const [gcCode, setGcCode] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [messengerStatus, setMessengerStatus] = useState("");
 
   useEffect(() => {
@@ -80,6 +84,7 @@ export default function AdminPage() {
       fetchProducts();
       fetchOrders();
       fetchBanners();
+      fetch("/api/gift-cards").then((r) => r.json()).then((d) => { if (Array.isArray(d)) setGiftCards(d); }).catch(() => {});
       // Load messenger settings
       fetch("/api/settings/messenger").then((r) => r.json()).then((s) => {
         setTgToken(s.tgToken || "");
@@ -203,6 +208,7 @@ export default function AdminPage() {
               { key: "collections", label: "Коллекции" },
               { key: "scent-calendar", label: "Аромат дня" },
               { key: "gift-sets", label: "Подарочные наборы" },
+              { key: "giftcards", label: "Подарочные карты" },
               { key: "categories", label: "Категории" },
               { key: "analytics", label: "Аналитика" },
               { key: "settings", label: "Настройки" },
@@ -616,6 +622,13 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 py-4 text-right">
                           <button
+                            onClick={() => setSelectedOrder(order)}
+                            className="text-xs text-accent hover:underline mr-3"
+                            title="Подробнее"
+                          >
+                            Подробнее
+                          </button>
+                          <button
                             onClick={async () => await deleteOrder(order.id)}
                             className="text-xs text-accent hover:underline"
                             title="Удалить заказ"
@@ -630,6 +643,67 @@ export default function AdminPage() {
               </table>
             </div>
           </>
+        )}
+
+        {selectedOrder && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => setSelectedOrder(null)}
+          >
+            <div
+              className="bg-bg border border-mist rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="serif text-xl font-light tracking-[0.08em] text-ink">
+                  Заказ {selectedOrder.id}
+                </h2>
+                <button onClick={() => setSelectedOrder(null)} className="p-2 rounded-full hover:bg-mist-strong">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <p className="text-xs text-ink-muted uppercase tracking-wider mb-1">Клиент</p>
+                  <p className="font-medium text-ink">{selectedOrder.customerName}</p>
+                  <p className="text-ink-muted">{selectedOrder.customerEmail}</p>
+                  {selectedOrder.customerPhone && <p className="text-ink-muted">📞 {selectedOrder.customerPhone}</p>}
+                  {selectedOrder.contactMethod && (
+                    <p className="text-ink-muted">
+                      Связь: {selectedOrder.contactMethod === "whatsapp" ? "WhatsApp" : selectedOrder.contactMethod === "max" ? "Max" : "Telegram"}
+                    </p>
+                  )}
+                  <p className="text-ink-muted">{selectedOrder.customerAddress}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-ink-muted uppercase tracking-wider mb-1">Дата</p>
+                  <p className="text-ink">{new Date(selectedOrder.createdAt).toLocaleString("ru-RU")}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-ink-muted uppercase tracking-wider mb-1">Состав заказа</p>
+                  <div className="border border-mist rounded-lg divide-y divide-mist/50">
+                    {(selectedOrder.items || []).map((it: any, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between px-3 py-2">
+                        <div>
+                          <p className="font-medium text-ink">{it.productName}</p>
+                          <p className="text-xs text-ink-muted">{it.quantity} × {it.price.toLocaleString("ru-RU")} ₽</p>
+                        </div>
+                        <p className="font-medium text-ink">{(it.price * it.quantity).toLocaleString("ru-RU")} ₽</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-mist">
+                  <p className="font-medium text-ink">Итого</p>
+                  <p className="font-medium text-ink">{selectedOrder.totalPrice.toLocaleString("ru-RU")} ₽</p>
+                </div>
+                <div>
+                  <p className="text-xs text-ink-muted uppercase tracking-wider mb-1">Статус</p>
+                  <p className="text-ink">{statusLabels[selectedOrder.status]}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* PROMOS TAB */}
@@ -1459,6 +1533,71 @@ export default function AdminPage() {
                   </div>
                 ))
               )}
+            </div>
+          </>
+        )}
+
+        {tab === "giftcards" && (
+          <>
+            <div className="mb-8">
+              <h1 className="serif text-3xl font-light tracking-[0.1em] text-ink">Подарочные карты</h1>
+              <p className="text-sm text-ink-muted mt-1">Создание и управление подарочными сертификатами.</p>
+            </div>
+            <div className="mb-6 p-6 bg-bg-elevated border border-mist rounded-xl shadow-sm">
+              <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4">Новая карта</h2>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-ink-muted mb-1.5">Код (необязательно)</label>
+                  <input value={gcCode} onChange={(e) => setGcCode(e.target.value)} className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm" placeholder="GC-XXXXXX" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-ink-muted mb-1.5">Сумма (₽)</label>
+                  <input type="number" value={gcAmount} onChange={(e) => setGcAmount(e.target.value)} className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm" placeholder="1000" />
+                </div>
+                <div className="flex items-end">
+                  <button
+                    onClick={async () => {
+                      const amt = Number(gcAmount);
+                      if (!amt || amt <= 0) { alert("Укажите сумму"); return; }
+                      const res = await fetch("/api/gift-cards", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount: amt, code: gcCode || undefined }) });
+                      if (!res.ok) { alert("Ошибка создания"); return; }
+                      const card = await res.json();
+                      setGiftCards((prev) => [card, ...prev]);
+                      setGcAmount("");
+                      setGcCode("");
+                    }}
+                    className="px-6 py-2.5 rounded-full bg-accent text-bg text-xs font-medium tracking-wide uppercase"
+                  >
+                    Создать
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-xl border border-mist bg-bg overflow-x-auto shadow-sm">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-mist bg-mist">
+                    <th className="px-4 py-3 font-medium text-ink-muted uppercase tracking-wider text-[11px]">Код</th>
+                    <th className="px-4 py-3 font-medium text-ink-muted uppercase tracking-wider text-[11px]">Начальная сумма</th>
+                    <th className="px-4 py-3 font-medium text-ink-muted uppercase tracking-wider text-[11px]">Баланс</th>
+                    <th className="px-4 py-3 font-medium text-ink-muted uppercase tracking-wider text-[11px]">Дата</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-mist/50">
+                  {giftCards.length === 0 ? (
+                    <tr><td colSpan={4} className="px-4 py-8 text-center text-ink-muted text-sm">Карт пока нет.</td></tr>
+                  ) : (
+                    giftCards.map((c) => (
+                      <tr key={c.code}>
+                        <td className="px-4 py-4 font-medium text-ink">{c.code}</td>
+                        <td className="px-4 py-4 text-ink-muted">{c.initialAmount.toLocaleString("ru-RU")} ₽</td>
+                        <td className="px-4 py-4 text-ink-muted">{c.balance.toLocaleString("ru-RU")} ₽</td>
+                        <td className="px-4 py-4 text-ink-muted text-xs">{new Date(c.createdAt).toLocaleString("ru-RU")}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </>
         )}
