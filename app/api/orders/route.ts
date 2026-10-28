@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJson, writeJson, ORDERS_FILE } from "@/lib/storage";
+import { prisma } from "@/lib/prisma";
+import { orderSchema, orderStatusSchema } from "@/lib/validations";
 
 export interface OrderItem {
   productId: string;
@@ -20,40 +21,57 @@ export interface Order {
 }
 
 export async function GET() {
-  const orders = await readJson<Order[]>(ORDERS_FILE, []);
-  return NextResponse.json(orders);
+  const orders = await prisma.order.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  return NextResponse.json(orders.map(parseOrder));
+}
+
+function parseOrder(o: any) {
+  return {
+    ...o,
+    items: JSON.parse(o.items),
+    createdAt: o.createdAt.toISOString(),
+  };
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const orders = await readJson<Order[]>(ORDERS_FILE, []);
-  const newOrder: Order = {
-    ...body,
-    id: `ORD-${Math.random().toString(36).slice(2, 9).toUpperCase()}`,
-    status: "new",
-    createdAt: new Date().toISOString(),
-  };
-  orders.unshift(newOrder);
-  await writeJson(ORDERS_FILE, orders);
-  return NextResponse.json(newOrder, { status: 201 });
+  const parsed = orderSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+  const data = parsed.data;
+  const order = await prisma.order.create({
+    data: {
+      id: `ORD-${Math.random().toString(36).slice(2, 9).toUpperCase()}`,
+      customerName: data.customerName,
+      customerEmail: data.customerEmail,
+      customerAddress: data.customerAddress,
+      items: JSON.stringify(data.items),
+      totalPrice: data.totalPrice,
+      status: "new",
+    },
+  });
+  return NextResponse.json(parseOrder(order), { status: 201 });
 }
 
 export async function PATCH(req: NextRequest) {
-  const { id, status } = await req.json();
-  const orders = await readJson<Order[]>(ORDERS_FILE, []);
-  const idx = orders.findIndex((o) => o.id === id);
-  if (idx === -1) {
-    return NextResponse.json({ error: "Order not found" }, { status: 404 });
+  const body = await req.json();
+  const parsed = orderStatusSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
-  orders[idx].status = status;
-  await writeJson(ORDERS_FILE, orders);
-  return NextResponse.json(orders[idx]);
+  const { id, status } = parsed.data;
+  const order = await prisma.order.update({
+    where: { id },
+    data: { status },
+  });
+  return NextResponse.json(parseOrder(order));
 }
 
 export async function DELETE(req: NextRequest) {
   const { id } = await req.json();
-  const orders = await readJson<Order[]>(ORDERS_FILE, []);
-  const filtered = orders.filter((o) => o.id !== id);
-  await writeJson(ORDERS_FILE, filtered);
+  await prisma.order.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }

@@ -1,46 +1,102 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJson, writeJson, CATALOG_FILE } from "@/lib/storage";
-import type { Product } from "@/data/products";
+import { prisma } from "@/lib/prisma";
+import { productSchema } from "@/lib/validations";
 
 export async function GET() {
-  const products = await readJson<Product[]>(CATALOG_FILE, []);
-  // If no persisted catalog, seed from data file
+  const products = await prisma.product.findMany({
+    orderBy: { createdAt: "asc" },
+  });
+
   if (products.length === 0) {
     const { products: seedProducts } = await import("@/data/products");
-    await writeJson(CATALOG_FILE, seedProducts);
-    return NextResponse.json(seedProducts);
+    for (const p of seedProducts) {
+      await prisma.product.create({
+        data: {
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          fullDescription: p.fullDescription,
+          price: p.price,
+          category: p.category,
+          legend: p.legend,
+          accent: p.accent,
+          stock: p.stock,
+          images: JSON.stringify(p.images),
+          notes: JSON.stringify(p.notes),
+          offer: p.offer ? JSON.stringify(p.offer) : null,
+          originalPrice: p.originalPrice ?? null,
+          discountPercent: p.discountPercent ?? null,
+        },
+      });
+    }
+    const seeded = await prisma.product.findMany({ orderBy: { createdAt: "asc" } });
+    return NextResponse.json(seeded.map(parseProduct));
   }
-  return NextResponse.json(products);
+
+  return NextResponse.json(products.map(parseProduct));
+}
+
+function parseProduct(p: any) {
+  return {
+    ...p,
+    images: JSON.parse(p.images),
+    notes: JSON.parse(p.notes),
+    offer: p.offer ? JSON.parse(p.offer) : undefined,
+  };
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const products = await readJson<Product[]>(CATALOG_FILE, []);
-  const newProduct: Product = {
-    ...body,
-    id: body.id || body.name.toLowerCase().replace(/[^\\w\\s-]/g, "").trim().replace(/[\\s_-]+/g, "-"),
-  };
-  products.push(newProduct);
-  await writeJson(CATALOG_FILE, products);
-  return NextResponse.json(newProduct, { status: 201 });
+  const parsed = productSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
+  const data = parsed.data;
+  const id = body.id || data.name.toLowerCase().replace(/[^\w\s-]/g, "").trim().replace(/[\s_-]+/g, "-");
+  const product = await prisma.product.create({
+    data: {
+      id,
+      name: data.name,
+      description: data.description,
+      fullDescription: data.fullDescription,
+      price: data.price,
+      category: data.category,
+      legend: data.legend,
+      accent: data.accent,
+      stock: data.stock,
+      images: JSON.stringify(data.images),
+      notes: JSON.stringify(data.notes),
+      offer: data.offer ? JSON.stringify(data.offer) : null,
+      originalPrice: data.originalPrice ?? null,
+      discountPercent: data.discountPercent ?? null,
+    },
+  });
+  return NextResponse.json(parseProduct(product), { status: 201 });
 }
 
 export async function PUT(req: NextRequest) {
   const { id, ...patch } = await req.json();
-  const products = await readJson<Product[]>(CATALOG_FILE, []);
-  const idx = products.findIndex((p) => p.id === id);
-  if (idx === -1) {
-    return NextResponse.json({ error: "Product not found" }, { status: 404 });
-  }
-  products[idx] = { ...products[idx], ...patch };
-  await writeJson(CATALOG_FILE, products);
-  return NextResponse.json(products[idx]);
+  const data: any = {};
+  if (patch.name !== undefined) data.name = patch.name;
+  if (patch.description !== undefined) data.description = patch.description;
+  if (patch.fullDescription !== undefined) data.fullDescription = patch.fullDescription;
+  if (patch.price !== undefined) data.price = Number(patch.price);
+  if (patch.category !== undefined) data.category = patch.category;
+  if (patch.legend !== undefined) data.legend = patch.legend;
+  if (patch.accent !== undefined) data.accent = patch.accent;
+  if (patch.stock !== undefined) data.stock = Number(patch.stock);
+  if (patch.images !== undefined) data.images = JSON.stringify(patch.images);
+  if (patch.notes !== undefined) data.notes = JSON.stringify(patch.notes);
+  if (patch.offer !== undefined) data.offer = patch.offer ? JSON.stringify(patch.offer) : null;
+  if (patch.originalPrice !== undefined) data.originalPrice = patch.originalPrice;
+  if (patch.discountPercent !== undefined) data.discountPercent = patch.discountPercent;
+
+  const product = await prisma.product.update({ where: { id }, data });
+  return NextResponse.json(parseProduct(product));
 }
 
 export async function DELETE(req: NextRequest) {
   const { id } = await req.json();
-  const products = await readJson<Product[]>(CATALOG_FILE, []);
-  const filtered = products.filter((p) => p.id !== id);
-  await writeJson(CATALOG_FILE, filtered);
+  await prisma.product.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }
