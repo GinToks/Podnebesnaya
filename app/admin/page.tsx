@@ -75,6 +75,15 @@ export default function AdminPage() {
       const { fetchOrders } = useOrderStore.getState();
       fetchProducts();
       fetchOrders();
+      // Load messenger settings
+      fetch("/api/settings/messenger").then((r) => r.json()).then((s) => {
+        const t = document.getElementById("tg-token") as HTMLInputElement;
+        const c = document.getElementById("tg-chatid") as HTMLInputElement;
+        const w = document.getElementById("wa-number") as HTMLInputElement;
+        if (t) t.value = s.tgToken || "";
+        if (c) c.value = s.tgChatId || "";
+        if (w) w.value = s.waNumber || "";
+      }).catch(() => {});
     }
   }, [isAuthenticated]);
 
@@ -1836,12 +1845,21 @@ export default function AdminPage() {
                   <input id="wa-number" className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink text-sm focus:border-accent outline-none transition-colors" placeholder="+7 999 123-45-67" />
                 </div>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     const tgToken = (document.getElementById("tg-token") as HTMLInputElement)?.value;
                     const tgChatId = (document.getElementById("tg-chatid") as HTMLInputElement)?.value;
                     const waNumber = (document.getElementById("wa-number") as HTMLInputElement)?.value;
-                    localStorage.setItem("podnebesnaya-messenger-settings", JSON.stringify({ tgToken, tgChatId, waNumber }));
-                    alert("Настройки сохранены");
+                    try {
+                      const res = await fetch("/api/settings/messenger", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ tgToken, tgChatId, waNumber }),
+                      });
+                      if (res.ok) alert("Настройки сохранены");
+                      else alert("Не удалось сохранить");
+                    } catch {
+                      alert("Ошибка сети");
+                    }
                   }}
                   className="px-5 py-2.5 rounded-full bg-accent text-bg text-xs font-medium tracking-wide uppercase hover:bg-accent-hover transition-colors"
                 >
