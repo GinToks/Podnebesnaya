@@ -53,6 +53,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ru_RU",
     siteName: "\u041f\u043e\u0434\u043d\u0435\u0431\u0435\u0441\u043d\u0430\u044f",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Поднебесная" }],
   },
   twitter: {
     card: "summary_large_image",

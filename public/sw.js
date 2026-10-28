@@ -1,9 +1,11 @@
-const CACHE_NAME = 'podnebesnaya-v2';
+const CACHE_NAME = 'podnebesnaya-v3';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
+  '/og-image.png',
+  '/offline.html',
 ];
 
 self.addEventListener('install', (event) => {
@@ -27,7 +29,23 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Network-first for API and dynamic content
+  // Navigations: network-first with offline fallback
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((c) => c || caches.match('/offline.html')))
+    );
+    return;
+  }
+
+  // Network-first for API and dynamic content (cache for offline catalog)
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/')) {
     event.respondWith(
       fetch(event.request)
