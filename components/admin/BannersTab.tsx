@@ -10,6 +10,7 @@ export default function BannersTab({ products }: { products: Product[] }) {
   const { banners, addBanner, updateBanner, deleteBanner, fetchBanners } = usePromoBannerStore();
   const { updateProduct } = useCatalogStore();
   const [editingBannerId, setEditingBannerId] = useState<string | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<{ title: string; subtitle: string; bgColor: string; textColor: string; discount: number; endDate: string } | null>(null);
   return (
           <>
             <div className="mb-8">
@@ -66,6 +67,21 @@ export default function BannersTab({ products }: { products: Product[] }) {
               </div>
 
               <div className="mt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const title = (document.getElementById("banner-title") as HTMLInputElement)?.value || "";
+                    const subtitle = (document.getElementById("banner-subtitle") as HTMLInputElement)?.value || "";
+                    const endDate = (document.getElementById("banner-enddate") as HTMLInputElement)?.value || "";
+                    const discount = Number((document.getElementById("banner-discount") as HTMLInputElement)?.value || 0);
+                    const bgColor = (document.getElementById("banner-bgcolor") as HTMLInputElement)?.value || "#E8B4B8";
+                    const textColor = (document.getElementById("banner-textcolor") as HTMLInputElement)?.value || "#3D2B1F";
+                    setBannerPreview({ title, subtitle, bgColor, textColor, discount, endDate });
+                  }}
+                  className="px-4 py-2 rounded-lg border border-mist text-ink text-sm hover:bg-mist transition-colors"
+                >
+                  Предпросмотр
+                </button>
                 <button
                   onClick={async () => {
                     const title = (document.getElementById("banner-title") as HTMLInputElement)?.value;
@@ -132,6 +148,16 @@ export default function BannersTab({ products }: { products: Product[] }) {
                 >
                   {editingBannerId ? "Сохранить изменения" : "Создать баннер"}
                 </button>
+                {bannerPreview && (
+                  <div className="mt-4 p-4 rounded-xl border border-mist" style={{ backgroundColor: bannerPreview.bgColor, color: bannerPreview.textColor }}>
+                    <h3 className="text-lg font-semibold">{bannerPreview.title || "Заголовок баннера"}</h3>
+                    {bannerPreview.subtitle && <p className="text-sm opacity-90 mt-1">{bannerPreview.subtitle}</p>}
+                    <div className="mt-2 text-xs opacity-80">
+                      Скидка: {bannerPreview.discount}% {bannerPreview.endDate ? `• до ${new Date(bannerPreview.endDate).toLocaleString("ru-RU")}` : ""}
+                    </div>
+                  </div>
+                )}
+
                 {editingBannerId && (
                   <button
                     onClick={() => {
