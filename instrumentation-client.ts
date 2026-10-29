@@ -4,6 +4,7 @@ const DSN = process.env.NEXT_PUBLIC_SENTRY_DSN || (typeof atob !== "undefined" ?
 
 Sentry.init({
   dsn: DSN,
+  tunnel: "/monitoring",
   tracesSampleRate: 1.0,
   tracePropagationTargets: ["localhost", /^https:\/\/.*\.vercel\.app/, /^https:\/\/podnebesnaya/],
   replaysSessionSampleRate: 0.1,
