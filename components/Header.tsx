@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, m } from "framer-motion";
-import { Menu, X, ShoppingCart, Heart, Shield, ArrowLeft } from "lucide-react";
+import { Menu, X, ShoppingCart, Heart, Shield, ArrowLeft, User } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
@@ -71,6 +71,14 @@ export default function Header() {
                   <ArrowLeft size={16} strokeWidth={2} /> На главную
                 </Link>
               )}
+              <Link
+                href="/account"
+                className="flex items-center gap-2 p-2 rounded-full hover:bg-mist transition-colors"
+                aria-label="Личный кабинет"
+              >
+                <User size={18} strokeWidth={2} />
+                <span className="hidden md:block text-xs font-semibold">Кабинет</span>
+              </Link>
               <button
                 onClick={() => setWishlistOpen(true)}
                 className="flex items-center gap-2 relative p-2 rounded-full hover:bg-mist transition-colors"
