@@ -33,7 +33,7 @@ export async function proxy(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
-  if (pathname.startsWith("/api/gift-cards") && !pathname.startsWith("/api/gift-cards/check") && !pathname.startsWith("/api/gift-cards/redeem")) {
+  if (pathname.startsWith("/api/gift-cards") && !pathname.startsWith("/api/gift-cards/check") && !pathname.startsWith("/api/gift-cards/redeem") && !pathname.startsWith("/api/gift-cards/mine") && !pathname.startsWith("/api/gift-cards/purchase")) {
     if (!(await isAdmin(req))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

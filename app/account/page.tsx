@@ -29,6 +29,14 @@ export default function AccountPage() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
+  const [giftCards, setGiftCards] = useState<any[]>([]);
+  const [gcAmount, setGcAmount] = useState(3000);
+  const [gcRecipientName, setGcRecipientName] = useState("");
+  const [gcRecipientEmail, setGcRecipientEmail] = useState("");
+  const [gcMessage, setGcMessage] = useState("");
+  const [gcCreating, setGcCreating] = useState(false);
+  const [gcCreatedCode, setGcCreatedCode] = useState<string | null>(null);
+  const [subscription, setSubscription] = useState<{ active: boolean; months: number | null; until: string | null } | null>(null);
   const [resending, setResending] = useState(false);
 
   const loadMe = async () => {
@@ -40,6 +48,10 @@ export default function AccountPage() {
         setUser({ email: data.email, name: data.name, emailVerified: data.emailVerified });
         const oRes = await fetch("/api/customer/orders");
         if (oRes.ok) setOrders(await oRes.json());
+        const sRes = await fetch("/api/customer/subscription");
+        if (sRes.ok) setSubscription(await sRes.json());
+        const gRes = await fetch("/api/gift-cards/mine");
+        if (gRes.ok) setGiftCards(await gRes.json());
       } else {
         setUser(null);
       }
@@ -70,6 +82,44 @@ export default function AccountPage() {
     await fetch("/api/customer/me", { method: "DELETE" });
     setUser(null);
     setOrders([]);
+  };
+
+  const createGiftCard = async () => {
+    setGcCreating(true);
+    try {
+      const res = await fetch("/api/gift-cards/purchase", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: gcAmount,
+          recipientName: gcRecipientName,
+          recipientEmail: gcRecipientEmail || user?.email,
+          message: gcMessage,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Ошибка создания");
+        return;
+      }
+      setGcCreatedCode(data.code);
+      setInfo(`Сертификат создан: ${data.code}`);
+      const gRes = await fetch("/api/gift-cards/mine");
+      if (gRes.ok) setGiftCards(await gRes.json());
+    } catch {
+      setError("Ошибка сети");
+    } finally {
+      setGcCreating(false);
+    }
+  };
+  const cancelSubscription = async () => {
+    try {
+      const res = await fetch("/api/customer/subscription", { method: "DELETE" });
+      if (res.ok) {
+        setSubscription({ active: false, months: subscription?.months ?? null, until: subscription?.until ?? null });
+        setInfo("Подписка отключена");
+      }
+    } catch {}
   };
 
   const resend = async () => {
@@ -150,7 +200,7 @@ export default function AccountPage() {
               </div>
               {error && <div className="flex items-center gap-2 text-sm text-accent"><AlertCircle className="w-4 h-4" />{error}</div>}
               {info && <div className="flex items-center gap-2 text-sm text-olive"><CheckCircle2 className="w-4 h-4" />{info}</div>}
-              <button type="submit" className="w-full py-3.5 rounded-xl bg-sage text-white text-sm font-semibold hover:bg-sage-dark transition-colors shadow-sm">
+              <button type="submit" className="w-full py-3.5 rounded-xl bg-ink text-bg text-sm font-semibold hover:opacity-90 transition-colors shadow-sm">
                 {mode === "login" ? "Войти" : "Зарегистрироваться"}
               </button>
             </form>
@@ -243,6 +293,78 @@ export default function AccountPage() {
                 </div>
               ))}
             </div>
+          )}
+        </div>
+
+        {/* Subscription */}
+        <div className="mb-8 bg-bg-elevated border border-mist rounded-2xl p-6 shadow-sm">
+          <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4 flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5 text-sage" /> Подписка
+          </h2>
+          {subscription?.active ? (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-ink">Активна</p>
+                {subscription.months && <p className="text-xs text-ink-muted">Тариф: {subscription.months} мес.</p>}
+                {subscription.until && <p className="text-xs text-ink-muted">До: {new Date(subscription.until).toLocaleDateString("ru-RU")}</p>}
+              </div>
+              <button onClick={cancelSubscription} className="px-4 py-2 rounded-xl border border-accent text-accent text-sm hover:bg-accent hover:text-bg transition-colors">
+                Отключить
+              </button>
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-ink-muted text-sm mb-4">Подписка не оформлена</p>
+              <Link href="/subscription" className="inline-block px-6 py-2.5 rounded-full bg-sage text-white text-sm font-medium hover:bg-sage-dark transition-colors">Оформить подписку</Link>
+            </div>
+          )}
+        </div>
+
+        {/* Gift Cards */}
+        <div className="mb-8 bg-bg-elevated border border-mist rounded-2xl p-6 shadow-sm">
+          <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4 flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5 text-sage" /> Подарочные карты
+          </h2>
+          {giftCards.length > 0 && (
+            <div className="mb-6 space-y-2">
+              {giftCards.map((g: any) => (
+                <div key={g.code} className="flex items-center justify-between p-3 border border-mist rounded-xl">
+                  <div>
+                    <p className="text-sm font-medium text-ink">{g.code}</p>
+                    <p className="text-xs text-ink-muted">Баланс: {g.balance} ₽ из {g.amount} ₽</p>
+                  </div>
+                  <span className="text-xs text-ink-muted">{g.active ? "Активна" : "Неактивна"}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-ink-muted mb-1">Номинал</label>
+              <input type="number" value={gcAmount} onChange={(e) => setGcAmount(Number(e.target.value))} className="w-full px-3 py-2 rounded-xl border border-mist bg-bg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-ink-muted mb-1">Имя получателя</label>
+              <input value={gcRecipientName} onChange={(e) => setGcRecipientName(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-mist bg-bg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-ink-muted mb-1">Email получателя</label>
+              <input value={gcRecipientEmail} onChange={(e) => setGcRecipientEmail(e.target.value)} placeholder={user?.email} className="w-full px-3 py-2 rounded-xl border border-mist bg-bg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-ink-muted mb-1">Сообщение</label>
+              <input value={gcMessage} onChange={(e) => setGcMessage(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-mist bg-bg text-sm" />
+            </div>
+          </div>
+          <button
+            onClick={createGiftCard}
+            disabled={gcCreating}
+            className="mt-4 px-6 py-2.5 rounded-full bg-sage text-white text-sm font-medium hover:bg-sage-dark transition-colors disabled:opacity-50"
+          >
+            {gcCreating ? "Создание..." : "Купить сертификат"}
+          </button>
+          {gcCreatedCode && (
+            <p className="mt-3 text-sm text-ink-muted">Создан код: <span className="font-medium text-ink">{gcCreatedCode}</span></p>
           )}
         </div>
 

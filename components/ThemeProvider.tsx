@@ -17,6 +17,8 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     root.style.setProperty("--color-accent-hover", colors.accentHover);
     root.style.setProperty("--color-olive", colors.olive);
     root.style.setProperty("--color-olive-hover", colors.oliveHover);
+    root.style.setProperty("--color-sage", colors.olive);
+    root.style.setProperty("--color-sage-dark", colors.oliveHover);
     root.style.setProperty("--color-sky", colors.sky);
     root.style.setProperty("--color-sky-hover", colors.skyHover);
     root.style.setProperty("--color-gold", colors.gold);

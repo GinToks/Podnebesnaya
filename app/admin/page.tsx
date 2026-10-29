@@ -18,6 +18,7 @@ import { useCategoryStore } from "@/store/categoryStore";
 import { useQuizStore } from "@/store/quizStore";
 import { Plus, Trash2, Save, X, ShieldOff, ArrowLeft, Check, Tag, Scroll, List, Clock, Loader2 } from "lucide-react";
 import OrdersTab from "@/components/admin/OrdersTab";
+import UsersTab from "@/components/admin/UsersTab";
 import GiftCardsTab from "@/components/admin/GiftCardsTab";
 import ScentCalendarTab from "@/components/admin/ScentCalendarTab";
 import CategoriesTab from "@/components/admin/CategoriesTab";
@@ -32,7 +33,7 @@ import CatalogTab from "@/components/admin/CatalogTab";
 import { m, AnimatePresence } from "framer-motion";
 import type { Product, ScentCategory, ScentNotes } from "@/data/products";
 
-type AdminTab = "catalog" | "orders" | "promos" | "banners" | "collections" | "categories" | "quiz" | "analytics" | "settings" | "scent-calendar" | "gift-sets" | "giftcards";
+type AdminTab = "catalog" | "orders" | "users" | "promos" | "banners" | "collections" | "categories" | "quiz" | "analytics" | "settings" | "scent-calendar" | "gift-sets" | "giftcards";
 
 export default function AdminPage() {
   const { isAuthenticated, isLoading, logout, checkAuth } = useAdminAuthStore();
@@ -230,6 +231,7 @@ export default function AdminPage() {
             {[
               { key: "catalog", label: "Каталог" },
               { key: "orders", label: "Заказы" },
+              { key: "users", label: "Пользователи" },
               { key: "promos", label: "Промокоды" },
               { key: "banners", label: "Баннеры" },
               { key: "collections", label: "Коллекции" },
@@ -258,7 +260,45 @@ export default function AdminPage() {
         {/* CATALOG TAB */}
         {tab === "catalog" && <CatalogTab ctx={ctx} />}
 
-{/* PROMOS TAB */}
+        {tab === "orders" && (
+          <OrdersTab
+            orderSearch={orderSearch}
+            setOrderSearch={setOrderSearch}
+            orderStatusFilter={orderStatusFilter}
+            setOrderStatusFilter={setOrderStatusFilter}
+            filteredOrders={filteredOrders as any}
+            statusLabels={statusLabels}
+            updateOrderStatus={updateOrderStatus as any}
+            deleteOrder={deleteOrder as any}
+            setSelectedOrder={setSelectedOrder as any}
+          />
+        )}
+
+        {tab === "giftcards" && (
+          <GiftCardsTab
+            gcCode={gcCode}
+            setGcCode={setGcCode}
+            gcAmount={gcAmount}
+            setGcAmount={setGcAmount}
+            giftCards={giftCards}
+            setGiftCards={setGiftCards}
+          />
+        )}
+
+        {tab === "users" && <UsersTab />}
+
+        {tab === "scent-calendar" && (
+          <ScentCalendarTab
+            products={products as any}
+            scentDate={scentDate}
+            setScentDate={setScentDate}
+            scentProductId={scentProductId}
+            setScentProductId={setScentProductId}
+            scentEntries={scentEntries as any}
+            setScent={setScent as any}
+            removeScent={removeScent as any}
+          />
+        )}
         {tab === "promos" && <PromosTab />}
 
 {/* QUIZ TAB */}

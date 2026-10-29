@@ -24,11 +24,23 @@ export default function CustomCursor() {
   return (
     <div
       className="fixed pointer-events-none z-[9999] transition-transform duration-75"
-      style={{ left: pos.x - 8, top: pos.y - 8 }}
+      style={{ left: pos.x - 12, top: pos.y - 12 }}
     >
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M8 0 Q10 4 8 8 Q6 4 8 0Z" fill="#E8B4B8" opacity="0.8" />
-        <path d="M8 8 Q11 10 8 16 Q5 10 8 8Z" fill="#D4949A" opacity="0.6" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M12 1 Q16 6 12 12 Q8 6 12 1Z"
+          fill="var(--color-accent, #6B8A5E)"
+          stroke="#ffffff"
+          strokeWidth="1.2"
+          opacity="0.95"
+        />
+        <path
+          d="M12 12 Q17 15 12 23 Q7 15 12 12Z"
+          fill="var(--color-accent-hover, #5A7A4E)"
+          stroke="#ffffff"
+          strokeWidth="1.2"
+          opacity="0.9"
+        />
       </svg>
     </div>
   );

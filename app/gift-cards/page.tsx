@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { useGiftCardStore } from "@/store/giftCardStore";
 import { useCartStore } from "@/store/cartStore";
 import { useToastStore } from "@/store/toastStore";
 import { Gift, CreditCard, Check } from "lucide-react";
@@ -8,7 +7,6 @@ import { Gift, CreditCard, Check } from "lucide-react";
 const PRESET_AMOUNTS = [1000, 2000, 3000, 5000];
 
 export default function GiftCardsPage() {
-  const { addCard } = useGiftCardStore();
   const { addItem } = useCartStore();
   const { addToast } = useToastStore();
   const [amount, setAmount] = useState(2000);
@@ -17,21 +15,28 @@ export default function GiftCardsPage() {
   const [message, setMessage] = useState("");
   const [createdCode, setCreatedCode] = useState<string | null>(null);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!recipientName || !recipientEmail) {
       addToast({ type: "error", title: "Заполните имя и email получателя" });
       return;
     }
-    const code = addCard({
-      amount,
-      balance: amount,
-      recipientName,
-      recipientEmail,
-      message,
-      active: true,
-    });
-    setCreatedCode(code);
-    addToast({ type: "success", title: "Подарочный сертификат создан", message: `Код: ${code}` });
+    try {
+      const res = await fetch("/api/gift-cards/purchase", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, recipientName, recipientEmail, message }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        addToast({ type: "error", title: data.error || "Ошибка создания" });
+        if (res.status === 401) window.location.href = "/account";
+        return;
+      }
+      setCreatedCode(data.code);
+      addToast({ type: "success", title: "Подарочный сертификат создан", message: `Код: ${data.code}` });
+    } catch {
+      addToast({ type: "error", title: "Ошибка сети" });
+    }
   };
 
   return (

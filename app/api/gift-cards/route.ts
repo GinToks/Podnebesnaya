@@ -9,6 +9,10 @@ async function ensureTable() {
     await prisma.$executeRawUnsafe(
       `CREATE TABLE IF NOT EXISTS "GiftCard" ("code" TEXT NOT NULL PRIMARY KEY, "initialAmount" INTEGER NOT NULL, "balance" INTEGER NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP)`
     );
+    await prisma.$executeRawUnsafe(`ALTER TABLE "GiftCard" ADD COLUMN IF NOT EXISTS "recipientName" TEXT`);
+    await prisma.$executeRawUnsafe(`ALTER TABLE "GiftCard" ADD COLUMN IF NOT EXISTS "recipientEmail" TEXT`);
+    await prisma.$executeRawUnsafe(`ALTER TABLE "GiftCard" ADD COLUMN IF NOT EXISTS "message" TEXT`);
+    await prisma.$executeRawUnsafe(`ALTER TABLE "GiftCard" ADD COLUMN IF NOT EXISTS "active" BOOLEAN NOT NULL DEFAULT TRUE`);
   } catch {}
 }
 
