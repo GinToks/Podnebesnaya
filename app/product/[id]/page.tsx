@@ -83,7 +83,7 @@ export default function ProductDetailPage() {
               availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
               url: `https://podnebesnaya.vercel.app/product/${product.id}`,
             },
-          }),
+          }).replace(/</g, "\u003c"),
         }}
       />
       <script
@@ -97,7 +97,7 @@ export default function ProductDetailPage() {
               { "@type": "ListItem", position: 2, name: "Каталог", item: "https://podnebesnaya.ru/#catalog" },
               { "@type": "ListItem", position: 3, name: product.name, item: `https://podnebesnaya.ru/product/${product.id}` },
             ],
-          }),
+          }).replace(/</g, "\u003c"),
         }}
       />
       <section className="py-20 sm:py-28 lg:py-36 relative z-10">

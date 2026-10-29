@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-const orderSchema = z.object({
+const checkoutFormSchema = z.object({
   name: z.string().min(2, "Укажите ваше имя"),
   email: z.string().email("Введите корректный email"),
   phone: z.string().min(5, "Укажите телефон"),
@@ -19,7 +19,7 @@ const orderSchema = z.object({
   address: z.string().min(5, "Укажите адрес доставки"),
 });
 
-type OrderForm = z.infer<typeof orderSchema>;
+type OrderForm = z.infer<typeof checkoutFormSchema>;
 
 export default function CartDrawer() {
   const { items, isOpen, close, removeItem, setQuantity, clear, totalPrice, totalQuantity } =
@@ -71,7 +71,7 @@ export default function CartDrawer() {
   }, [cartTimer]);
 
   const form = useForm<OrderForm>({
-    resolver: zodResolver(orderSchema),
+    resolver: zodResolver(checkoutFormSchema),
     defaultValues: { name: "", email: "", phone: "", contactMethod: "telegram", address: "" },
   });
 

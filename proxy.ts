@@ -86,8 +86,8 @@ export async function proxy(req: NextRequest) {
     }
   }
 
-  // Audit log for admin API mutations
-  if (pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD") {
+  // Audit log for admin API mutations (dev only)
+  if (process.env.NODE_ENV !== "production" && pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD") {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     console.info(JSON.stringify({ audit: true, ts: new Date().toISOString(), method: req.method, path: pathname, ip }));
   }
