@@ -1,4 +1,5 @@
 "use client";
+import { memo } from "react";
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import { X, ShoppingCart, Trash2, ArrowRight, Check, Flame, Tag, Loader2, Gift } from "lucide-react";
@@ -21,7 +22,7 @@ const checkoutFormSchema = z.object({
 
 type OrderForm = z.infer<typeof checkoutFormSchema>;
 
-export default function CartDrawer() {
+function CartDrawer() {
   const { items, isOpen, close, removeItem, setQuantity, clear, totalPrice, totalQuantity } =
     useCartStore();
   const { codes, applyCode, incrementUses } = usePromoStore();
@@ -494,3 +495,5 @@ export default function CartDrawer() {
     </AnimatePresence>
   );
 }
+
+export default memo(CartDrawer);

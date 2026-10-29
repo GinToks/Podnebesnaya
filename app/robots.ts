@@ -1,15 +1,9 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = process.env.NEXT_PUBLIC_APP_URL || "https://podnebesnaya.ru";
+  const base = process.env.NEXT_PUBLIC_APP_URL || "https://podnebesnaya.vercel.app";
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        disallow: ["/admin", "/admin/", "/api/"],
-      },
-    ],
+    rules: { userAgent: "*", allow: "/" },
     sitemap: `${base}/sitemap.xml`,
   };
 }
