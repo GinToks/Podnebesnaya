@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function TrackPage() {
   const [orderId, setOrderId] = useState("");
-  const [order, setOrder] = useState<any>(null);
+  const [order, setOrder] = useState<unknown>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 

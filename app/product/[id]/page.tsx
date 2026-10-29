@@ -19,7 +19,7 @@ export default function ProductDetailPage() {
 
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [mainImage, setMainImage] = useState<any>(null);
+  const [mainImage, setMainImage] = useState<unknown>(null);
 
   const product: Product | undefined = id && products.length ? getProduct(String(id)) : undefined;
 

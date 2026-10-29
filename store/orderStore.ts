@@ -38,7 +38,7 @@ export const useOrderStore = create<OrderState>()((set, get) => ({
   error: null,
   fetchOrders: async () => {
     set({ isLoading: true, error: null });
-    let lastErr: any;
+    let lastErr: unknown;
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         const res = await fetch("/api/orders");

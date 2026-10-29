@@ -155,7 +155,7 @@ export const useQuizStore = create<QuizState>()(
       }),
       {
         name: "podnebesnaya-quiz",
-        partialize: (state) => ({ questions: state.questions, settings: state.settings }) as any,
+        partialize: (state) => ({ questions: state.questions, settings: state.settings }) as unknown,
         storage: typeof window !== "undefined" ? createJSONStorage(() => localStorage) : undefined,
       }
     )

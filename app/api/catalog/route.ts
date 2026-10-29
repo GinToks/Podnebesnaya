@@ -45,7 +45,7 @@ export async function GET() {
   });
 }
 
-function parseProduct(p: any) {
+function parseProduct(p: Record<string, unknown>) {
   return {
     ...p,
     images: JSON.parse(p.images),
@@ -91,8 +91,8 @@ export async function PUT(req: NextRequest) {
   if (!body.id) return NextResponse.json({ error: "id required" }, { status: 400 });
   const parsed = productSchema.partial().safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
-  const { id, ...patch } = parsed.data as any;
-  const data: any = {};
+  const { id, ...patch } = parsed.data as Record<string, unknown>;
+  const data: Record<string, unknown> = {};
   if (patch.name !== undefined) data.name = patch.name;
   if (patch.description !== undefined) data.description = patch.description;
   if (patch.fullDescription !== undefined) data.fullDescription = patch.fullDescription;

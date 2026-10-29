@@ -82,7 +82,7 @@ export default function AdminPage() {
   const [giftCards, setGiftCards] = useState<any[]>([]);
   const [gcAmount, setGcAmount] = useState("");
   const [gcCode, setGcCode] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
   const [orderSearch, setOrderSearch] = useState("");
   const [orderStatusFilter, setOrderStatusFilter] = useState("all");
   const [messengerStatus, setMessengerStatus] = useState("");
@@ -150,14 +150,14 @@ export default function AdminPage() {
       name: draft.name,
       description: draft.description,
       fullDescription: draft.fullDescription ?? "",
-      notes: (draft.notes as any) ?? { top: [], middle: [], base: [] },
+      notes: (draft.notes as { top?: string[]; middle?: string[]; base?: string[] }) ?? { top: [], middle: [], base: [] },
       price: Number(draft.price) || 0,
       costPrice: draft.costPrice ?? undefined,
       category: (draft.category as ScentCategory) || "fresh",
       legend: draft.legend ?? "",
       accent: draft.accent || "#C41E3A",
       stock: Number(draft.stock) || 0,
-      images: (draft.images as any) ?? [{ id: "main", url: "", alt: draft.name ?? "" }],
+      images: (draft.images as { id: string; url: string; alt: string }[]) ?? [{ id: "main", url: "", alt: draft.name ?? "" }],
       offer: newOfferLabel ? { label: newOfferLabel, active: true } : undefined,
       originalPrice: draft.originalPrice,
       discountPercent: draft.discountPercent,

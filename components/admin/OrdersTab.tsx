@@ -86,7 +86,7 @@ export default function OrdersTab({
                   <td className="px-4 py-4">
                     <select
                       value={order.status}
-                      onChange={async (e) => await updateOrderStatus(order.id, e.target.value as any)}
+                      onChange={async (e) => await updateOrderStatus(order.id, e.target.value as "new" | "processing" | "completed" | "cancelled")}
                       className="px-2 py-1 rounded bg-mist border border-mist text-[11px] text-ink outline-none focus:border-sky"
                     >
                       {["new", "processing", "completed", "cancelled"].map((s) => (

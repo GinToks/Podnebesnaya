@@ -50,9 +50,9 @@ export default function QuizTab() {
                   <div className="flex flex-wrap gap-2">
                     {["fresh", "floral", "woody", "spicy"].map((cat) => (
                       <label key={cat} className="flex items-center gap-1 text-xs text-ink-muted">
-                        <input type="checkbox" checked={opt.categories.includes(cat as any)} onChange={(e) => {
+                        <input type="checkbox" checked={opt.categories.includes(cat as never)} onChange={(e) => {
                           const cats = e.target.checked ? [...opt.categories, cat] : opt.categories.filter((c) => c !== cat);
-                          updateQuizOption(q.id, opt.id, { categories: cats as any });
+                          updateQuizOption(q.id, opt.id, { categories: cats as never });
                         }} className="rounded border-mist" />
                         {cat}
                       </label>

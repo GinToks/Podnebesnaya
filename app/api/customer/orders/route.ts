@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     where: { customerEmail: email },
     orderBy: { createdAt: "desc" },
   });
-  return NextResponse.json(orders.map((o: any) => ({ ...o, items: safeParse(o.items) })));
+  return NextResponse.json(orders.map((o: Record<string, unknown>) => ({ ...o, items: safeParse(o.items) })));
 }
 
 function safeParse(s: string) {

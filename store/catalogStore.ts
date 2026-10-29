@@ -32,7 +32,7 @@ export const useCatalogStore = create<CatalogState>()(
     setProducts: (products) => set({ products }),
     fetchProducts: async () => {
       set({ isLoading: true, error: null });
-      let lastErr: any;
+      let lastErr: unknown;
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
           const res = await fetch("/api/catalog");

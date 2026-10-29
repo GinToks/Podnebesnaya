@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   if (row?.value) { try { settings = { ...settings, ...JSON.parse(row.value) }; } catch {} }
   if (!settings.tgToken || !settings.tgChatId) return NextResponse.json({ skipped: true });
 
-  const itemsText = items.map((i: any) => `• ${i.productName} x${i.quantity}`).join("\n");
+  const itemsText = items.map((i: { productName?: string; quantity?: number }) => `• ${i.productName} x${i.quantity}`).join("\n");
   const message = `🛒 Брошенная корзина\nТовары:\n${itemsText}`;
   try {
     await fetch(`https://api.telegram.org/bot${settings.tgToken}/sendMessage`, {

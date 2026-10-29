@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     );
   } catch {}
 
-  const rows: any[] = await prisma.$queryRawUnsafe(
+  const rows = await prisma.$queryRawUnsafe(
     `UPDATE "GiftCard" SET balance = balance - $1 WHERE code = $2 AND balance >= $1 RETURNING *`,
     amount,
     code
@@ -34,5 +34,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Недостаточно средств", balance: card.balance }, { status: 400 });
   }
 
-  return NextResponse.json({ success: true, balance: rows[0].balance, deducted: amount });
+  return NextResponse.json({ success: true, balance: (rows[0] as { balance: number }).balance, deducted: amount });
 }

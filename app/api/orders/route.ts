@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(parsed);
 }
 
-function parseOrder(o: any) {
+function parseOrder(o: Record<string, unknown>) {
   return {
     ...o,
     customerPhone: o.phone ?? o.customerPhone ?? null,
@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
       notificationError = "Настройки не найдены в БД";
     }
 
-    const itemsText = data.items.map((i: any) => `• ${i.productName} x${i.quantity} — ${i.price * i.quantity} ₽`).join("\n");
+    const itemsText = data.items.map((i: { productName?: string; quantity?: number; price?: number }) => `• ${i.productName} x${i.quantity} — ${i.price} ₽`).join("\n");
     const contactLabel = data.contactMethod === "whatsapp" ? "WhatsApp" : data.contactMethod === "max" ? "Max" : "Telegram";
     const message = `🛒 Новый заказ ${order.id}\nКлиент: ${data.customerName}\nТелефон: ${data.customerPhone || "—"}\nСвязь: ${contactLabel}\nEmail: ${data.customerEmail}\nАдрес: ${data.customerAddress}\n\nТовары:\n${itemsText}\n\nИтого: ${totalPrice} ₽`;
 
@@ -179,7 +179,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
   const { id, status, trackingNumber } = parsed.data;
-  const data: any = { status };
+  const data: Record<string, unknown> = { status };
   if (trackingNumber !== undefined) data.trackingNumber = trackingNumber || null;
   const order = await prisma.order.update({
     where: { id },

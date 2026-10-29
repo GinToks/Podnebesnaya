@@ -36,7 +36,7 @@ async function readBanners() {
   try { return JSON.parse(row.value); } catch { return []; }
 }
 
-async function writeBanners(banners: any[]) {
+async function writeBanners(banners: Record<string, unknown>[]) {
   await ensureTable();
   await prisma.adminSetting.upsert({
     where: { key: KEY },
@@ -81,7 +81,7 @@ export async function PUT(req: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   const { id, ...updates } = parsed.data;
   const banners = await readBanners();
-  const idx = banners.findIndex((b: any) => b.id === id);
+  const idx = banners.findIndex((b: Record<string, unknown>) => b.id === id);
   if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
   banners[idx] = { ...banners[idx], ...updates };
   await writeBanners(banners);
@@ -94,7 +94,7 @@ export async function DELETE(req: NextRequest) {
   const id = String(body.id || "");
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
   const banners = await readBanners();
-  const filtered = banners.filter((b: any) => b.id !== id);
+  const filtered = banners.filter((b: Record<string, unknown>) => b.id !== id);
   await writeBanners(filtered);
   return NextResponse.json({ success: true });
 }
