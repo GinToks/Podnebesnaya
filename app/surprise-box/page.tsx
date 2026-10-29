@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { m } from "framer-motion";
 import { Gift, ShoppingCart, Sparkles, PackageOpen } from "lucide-react";
@@ -7,7 +7,6 @@ import Header from "@/components/Header";
 import PromoBanner from "@/components/PromoBanner";
 import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
-import { useCatalogStore } from "@/store/catalogStore";
 import { useCartStore } from "@/store/cartStore";
 import { useToastStore } from "@/store/toastStore";
 import type { Product } from "@/data/products";
@@ -16,31 +15,34 @@ const SURPRISE_PRICE = 9900;
 const INDIVIDUAL_ESTIMATE = 13500;
 
 export default function SurpriseBoxPage() {
-  const { products, fetchProducts } = useCatalogStore();
   const { addItem, open } = useCartStore();
   const { addToast } = useToastStore();
   const [added, setAdded] = useState(false);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
   const handleBuy = () => {
-    const pool = products.filter((p: Product) => (p.stock ?? 0) > 0);
-    if (pool.length < 3) {
-      addToast({ type: "error", title: "Недостаточно товаров для сюрприза" });
-      return;
-    }
-    const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    const chosen = shuffled.slice(0, 3);
-    chosen.forEach((p) => addItem(p, 1));
+    const surpriseProduct: Product = {
+      id: "surprise-box",
+      name: "Сюрприз-бокс (3 случайные свечи)",
+      description: "Мистическая коробочка с тремя случайными авторскими свечами",
+      fullDescription: "Мистическая коробочка с тремя случайными авторскими свечами. Состав раскрывается при получении.",
+      notes: { top: [], middle: [], base: [] },
+      price: SURPRISE_PRICE,
+      costPrice: 0,
+      category: "floral",
+      legend: "Сюрприз",
+      accent: "#E8B4B8",
+      images: [],
+      stock: 999,
+      tags: ["surprise"],
+    };
+    addItem(surpriseProduct, 1);
     open();
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
     addToast({
       type: "success",
       title: "Сюрприз-бокс добавлен",
-      message: "3 случайные свечи уже в корзине",
+      message: "Сюрприз-бокс в корзине",
     });
   };
 
@@ -157,7 +159,7 @@ export default function SurpriseBoxPage() {
                 </button>
 
                 <p className="text-xs text-ink-muted mt-4">
-                  Нажимая кнопку, вы добавляете 3 случайные свечи в корзину по специальной цене.
+                  Нажимая кнопку, вы добавляете сюрприз-бокс в корзину по специальной цене. Состав раскрывается при получении.
                 </p>
               </m.div>
             </div>
