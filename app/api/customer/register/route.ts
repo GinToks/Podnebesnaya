@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, createSessionToken } from "@/lib/customerAuth";
 import { customerRegisterSchema } from "@/lib/validations";
+import { sendEmail, verificationEmailHtml } from "@/lib/email";
 
 async function ensureTable() {
   try {
@@ -35,13 +36,7 @@ export async function POST(req: NextRequest) {
   // Send verification email (webhook if configured, otherwise log in dev)
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const link = `${baseUrl}/verify?token=${verifyToken}`;
-  if (process.env.EMAIL_WEBHOOK_URL) {
-    try {
-      await fetch(process.env.EMAIL_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: email, subject: "Подтвердите email", link }) });
-    } catch {}
-  } else if (process.env.NODE_ENV !== "production") {
-    console.info("[email-verify] link for", email, link);
-  }
+  await sendEmail({ to: email, subject: "Подтвердите email — Поднебесная", html: verificationEmailHtml(link, email) });
   const token = createSessionToken(customer.email);
   const res = NextResponse.json({ ok: true, email: customer.email, name: customer.name, emailVerified: false });
   res.cookies.set("customer_session", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: 30 * 24 * 60 * 60 });

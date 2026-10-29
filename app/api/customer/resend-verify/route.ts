@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifySessionToken } from "@/lib/customerAuth";
+import { sendEmail, verificationEmailHtml } from "@/lib/email";
 
 async function ensureTable() {
   try {
@@ -25,12 +26,6 @@ export async function POST(req: NextRequest) {
   await prisma.$executeRawUnsafe(`UPDATE "Customer" SET "verifyToken" = $1 WHERE "email" = $2`, newToken, email);
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const link = `${baseUrl}/verify?token=${newToken}`;
-  if (process.env.EMAIL_WEBHOOK_URL) {
-    try {
-      await fetch(process.env.EMAIL_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: email, subject: "Подтвердите email", link }) });
-    } catch {}
-  } else if (process.env.NODE_ENV !== "production") {
-    console.info("[email-verify] link for", email, link);
-  }
+  await sendEmail({ to: email, subject: "Подтвердите email — Поднебесная", html: verificationEmailHtml(link, email) });
   return NextResponse.json({ ok: true });
 }
