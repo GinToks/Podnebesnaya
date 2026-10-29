@@ -1,6 +1,7 @@
 "use client";
 
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
+import * as Sentry from "@sentry/nextjs";
 import type { ReactNode } from "react";
 import type { FallbackProps } from "react-error-boundary";
 
@@ -27,7 +28,7 @@ export default function ErrorBoundary({ children, fallback }: ErrorBoundaryProps
   return (
     <ReactErrorBoundary
       FallbackComponent={fallback ? () => <>{fallback}</> : Fallback}
-      onError={(error, info) => console.error("ErrorBoundary caught:", error, info)}
+      onError={(error, info) => { console.error("ErrorBoundary caught:", error, info); Sentry.captureException(error, { contexts: { react: { componentStack: info.componentStack } } }); }}
     >
       {children}
     </ReactErrorBoundary>
