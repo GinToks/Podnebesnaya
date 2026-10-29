@@ -108,6 +108,15 @@ export async function PUT(req: NextRequest) {
   if (patch.originalPrice !== undefined) data.originalPrice = patch.originalPrice;
   if (patch.discountPercent !== undefined) data.discountPercent = patch.discountPercent;
 
+  // Save version snapshot before update
+  try {
+    await prisma.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS "ProductHistory" ("id" TEXT NOT NULL PRIMARY KEY, "productId" TEXT NOT NULL, "snapshot" TEXT NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP)`);
+    const current = await prisma.product.findUnique({ where: { id: String(id) } });
+    if (current) {
+      await prisma.$executeRawUnsafe(`INSERT INTO "ProductHistory" ("id","productId","snapshot") VALUES ($1,$2,$3)`, globalThis.crypto.randomUUID(), String(id), JSON.stringify(current));
+    }
+  } catch {}
+
   const product = await prisma.product.update({ where: { id: String(id) }, data: data as never });
   return NextResponse.json(parseProduct(product));
 }
