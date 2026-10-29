@@ -131,12 +131,16 @@ ym(${YANDEX_METRICA_ID}, "init", { clickmap:true, trackLinks:true, accurateTrack
         </noscript>
 
         {/* VK Pixel */}
-        <Script id="vk-pixel" strategy="afterInteractive">
-          {`!function(){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src="https://vk.com/rtrg?p=${VK_PIXEL_ID}",document.head.appendChild(t)}();`}
-        </Script>
-        <noscript>
-          <img src={`https://vk.com/rtrg?p=${VK_PIXEL_ID}`} style={{ position: "fixed", left: "-9999px" }} alt="" />
-        </noscript>
+        {VK_PIXEL_ID && !VK_PIXEL_ID.includes("XXXX") && (
+          <>
+            <Script id="vk-pixel" strategy="afterInteractive">
+              {`!function(){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src="https://vk.com/rtrg?p=${VK_PIXEL_ID}",document.head.appendChild(t)}();`}
+            </Script>
+            <noscript>
+              <img src={`https://vk.com/rtrg?p=${VK_PIXEL_ID}`} style={{ position: "fixed", left: "-9999px" }} alt="" />
+            </noscript>
+          </>
+        )}
       </body>
     </html>
   );

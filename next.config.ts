@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://www.google-analytics.com https://mc.yandex.ru https://*.neon.tech https://*.sentry.io https://*.ingest.sentry.io",
+              "connect-src 'self' https://www.google-analytics.com https://mc.yandex.ru https://*.neon.tech https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://o4512338470764544.ingest.de.sentry.io",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
