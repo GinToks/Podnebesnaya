@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Order } from "@/store/orderStore";
 
 interface Props {
@@ -14,6 +15,8 @@ interface Props {
   setSelectedOrder: (o: Order | null) => void;
 }
 
+const PAGE_SIZE = 10;
+
 export default function OrdersTab({
   orderSearch,
   setOrderSearch,
@@ -25,6 +28,11 @@ export default function OrdersTab({
   deleteOrder,
   setSelectedOrder,
 }: Props) {
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageOrders = filteredOrders.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
   return (
     <>
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
@@ -103,7 +111,7 @@ export default function OrdersTab({
                 <td colSpan={5} className="px-4 py-8 text-center text-ink-muted text-sm">Заказов пока нет.</td>
               </tr>
             ) : (
-              filteredOrders.map((order) => (
+              pageOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-mist/30 transition-colors group">
                   <td className="px-4 py-4">
                     <p className="font-medium text-ink">{order.id}</p>
@@ -137,6 +145,27 @@ export default function OrdersTab({
             )}
           </tbody>
         </table>
+        {filteredOrders.length > PAGE_SIZE && (
+          <div className="flex items-center justify-between p-3 border-t border-mist text-sm">
+            <button
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={safePage === 0}
+              className="px-3 py-1.5 rounded border border-mist text-ink disabled:opacity-40"
+            >
+              Назад
+            </button>
+            <span className="text-ink-muted">
+              Стр. {safePage + 1} из {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={safePage >= totalPages - 1}
+              className="px-3 py-1.5 rounded border border-mist text-ink disabled:opacity-40"
+            >
+              Вперёд
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

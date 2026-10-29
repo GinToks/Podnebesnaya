@@ -266,11 +266,11 @@ export default function AdminPage() {
             setOrderSearch={setOrderSearch}
             orderStatusFilter={orderStatusFilter}
             setOrderStatusFilter={setOrderStatusFilter}
-            filteredOrders={filteredOrders as any}
+            filteredOrders={filteredOrders}
             statusLabels={statusLabels}
-            updateOrderStatus={updateOrderStatus as any}
-            deleteOrder={deleteOrder as any}
-            setSelectedOrder={setSelectedOrder as any}
+            updateOrderStatus={updateOrderStatus}
+            deleteOrder={deleteOrder}
+            setSelectedOrder={setSelectedOrder}
           />
         )}
 
@@ -289,14 +289,14 @@ export default function AdminPage() {
 
         {tab === "scent-calendar" && (
           <ScentCalendarTab
-            products={products as any}
+            products={products}
             scentDate={scentDate}
             setScentDate={setScentDate}
             scentProductId={scentProductId}
             setScentProductId={setScentProductId}
-            scentEntries={scentEntries as any}
-            setScent={setScent as any}
-            removeScent={removeScent as any}
+            scentEntries={scentEntries}
+            setScent={setScent}
+            removeScent={removeScent}
           />
         )}
         {tab === "promos" && <PromosTab />}

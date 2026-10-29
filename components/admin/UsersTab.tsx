@@ -33,6 +33,8 @@ export default function UsersTab() {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [subFilter, setSubFilter] = useState<"all" | "active" | "none">("all");
+  const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<User | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
@@ -65,8 +67,10 @@ export default function UsersTab() {
 
   const filtered = users.filter((u) => {
     const q = search.toLowerCase();
-    if (!q) return true;
-    return u.email.toLowerCase().includes(q) || (u.name || "").toLowerCase().includes(q);
+    if (q && !(u.email.toLowerCase().includes(q) || (u.name || "").toLowerCase().includes(q))) return false;
+    if (subFilter === "active" && !u.subscriptionActive) return false;
+    if (subFilter === "none" && u.subscriptionActive) return false;
+    return true;
   });
 
   const sorted = [...filtered].sort((a, b) => {
@@ -83,6 +87,11 @@ export default function UsersTab() {
     if (va > vb) return sortDir === "asc" ? 1 : -1;
     return 0;
   });
+
+  const PAGE_SIZE = 15;
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageUsers = sorted.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -110,6 +119,15 @@ export default function UsersTab() {
           />
         </div>
         <select
+          value={subFilter}
+          onChange={(e) => { setSubFilter(e.target.value as any); setPage(0); }}
+          className="px-3 py-2 rounded-xl border border-mist bg-bg-elevated text-sm"
+        >
+          <option value="all">Все</option>
+          <option value="active">С подпиской</option>
+          <option value="none">Без подписки</option>
+        </select>
+        <select
           value={sortKey}
           onChange={(e) => setSortKey(e.target.value as SortKey)}
           className="px-3 py-2 rounded-xl border border-mist bg-bg-elevated text-sm"
@@ -131,7 +149,8 @@ export default function UsersTab() {
       {loading ? (
         <p className="text-ink-muted">Загрузка...</p>
       ) : (
-        <div className="overflow-x-auto bg-bg-elevated border border-mist rounded-xl">
+        <>
+          <div className="overflow-x-auto bg-bg-elevated border border-mist rounded-xl">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-mist text-left text-ink-muted">
@@ -144,7 +163,7 @@ export default function UsersTab() {
               </tr>
             </thead>
             <tbody>
-              {sorted.map((u) => (
+              {pageUsers.map((u) => (
                 <tr key={u.id} className="border-b border-mist last:border-0 hover:bg-mist/30">
                   <td className="p-3">{u.email}</td>
                   <td className="p-3">{u.name || "—"}</td>
@@ -172,6 +191,28 @@ export default function UsersTab() {
             </tbody>
           </table>
         </div>
+        {sorted.length > PAGE_SIZE && (
+          <div className="flex items-center justify-between mt-4 text-sm">
+            <button
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={safePage === 0}
+              className="px-3 py-1.5 rounded border border-mist text-ink disabled:opacity-40"
+            >
+              Назад
+            </button>
+            <span className="text-ink-muted">
+              Стр. {safePage + 1} из {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={safePage >= totalPages - 1}
+              className="px-3 py-1.5 rounded border border-mist text-ink disabled:opacity-40"
+            >
+              Вперёд
+            </button>
+          </div>
+        )}
+        </>
       )}
 
       {selected && (
