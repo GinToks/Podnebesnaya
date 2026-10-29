@@ -35,9 +35,12 @@ const notoSerifSc = Noto_Serif_SC({
 });
 
 // Placeholder tracking IDs - configure via env or replace here
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || "G-XXXXXXXXXX";
-const YANDEX_METRICA_ID = process.env.NEXT_PUBLIC_YANDEX_METRICA_ID || "XXXXXXXX";
-const VK_PIXEL_ID = process.env.NEXT_PUBLIC_VK_PIXEL_ID || "VK-RTRG-XXXXXX-XXXX";
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || "";
+const YANDEX_METRICA_ID = process.env.NEXT_PUBLIC_YANDEX_METRICA_ID || "";
+const VK_PIXEL_ID = process.env.NEXT_PUBLIC_VK_PIXEL_ID || "";
+
+const hasRealGA = /^G-[A-Z0-9]+$/i.test(GA_MEASUREMENT_ID) && !GA_MEASUREMENT_ID.includes("X");
+const hasRealYandex = /^\d+$/.test(YANDEX_METRICA_ID);
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -104,6 +107,8 @@ export default function RootLayout({
         </ToastProvider>
 
         {/* Google Analytics */}
+        {hasRealGA && (
+          <>
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
           strategy="afterInteractive"
@@ -115,8 +120,12 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GA_MEASUREMENT_ID}');`}
         </Script>
+          </>
+        )}
 
         {/* Yandex.Metrica */}
+        {hasRealYandex && (
+          <>
         <Script id="yandex-metrica" strategy="afterInteractive">
           {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
 m[i].l=1*new Date();
@@ -130,6 +139,8 @@ ym(${YANDEX_METRICA_ID}, "init", { clickmap:true, trackLinks:true, accurateTrack
             <img src={`https://mc.yandex.ru/watch/${YANDEX_METRICA_ID}`} style={{ position: "absolute", left: "-9999px" }} alt="" />
           </div>
         </noscript>
+          </>
+        )}
 
         {/* VK Pixel */}
         {VK_PIXEL_ID && !VK_PIXEL_ID.includes("XXXX") && (

@@ -32,8 +32,11 @@ export async function POST(req: NextRequest) {
   if (!customer || !verifyPassword(password, customer.password)) {
     return NextResponse.json({ error: "Неверный email или пароль" }, { status: 401 });
   }
+  try {
+    await prisma.$executeRawUnsafe(`UPDATE "Customer" SET "emailVerified" = TRUE WHERE "email" = $1`, email);
+  } catch {}
   const token = createSessionToken(customer.email);
-  const res = NextResponse.json({ ok: true, email: customer.email, name: customer.name });
+  const res = NextResponse.json({ ok: true, email: customer.email, name: customer.name, emailVerified: true });
   res.cookies.set("customer_session", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: 30 * 24 * 60 * 60 });
   return res;
 }

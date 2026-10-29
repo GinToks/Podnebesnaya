@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, createSessionToken } from "@/lib/customerAuth";
 import { customerRegisterSchema } from "@/lib/validations";
-import { sendEmail, verificationEmailHtml } from "@/lib/email";
 
 async function ensureTable() {
   try {
@@ -26,19 +25,15 @@ export async function POST(req: NextRequest) {
   const name = (parsed.data.name || "").trim();
   const exists = await prisma.customer.findUnique({ where: { email } });
   if (exists) return NextResponse.json({ error: "Такой email уже зарегистрирован" }, { status: 409 });
-  const verifyToken = globalThis.crypto.randomUUID();
   const customer = await prisma.customer.create({
     data: { email, password: hashPassword(password), name: name || null },
   });
   try {
-    await prisma.$executeRawUnsafe(`UPDATE "Customer" SET "verifyToken" = $1 WHERE "email" = $2`, verifyToken, email);
+    await prisma.$executeRawUnsafe(`UPDATE "Customer" SET "emailVerified" = TRUE WHERE "email" = $1`, email);
   } catch {}
-  // Send verification email (webhook if configured, otherwise log in dev)
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const link = `${baseUrl}/verify?token=${verifyToken}`;
-  await sendEmail({ to: email, subject: "Подтвердите email — Поднебесная", html: verificationEmailHtml(link, email) });
+  // Email verification temporarily disabled (no verified Resend domain yet).
   const token = createSessionToken(customer.email);
-  const res = NextResponse.json({ ok: true, email: customer.email, name: customer.name, emailVerified: false });
+  const res = NextResponse.json({ ok: true, email: customer.email, name: customer.name, emailVerified: true });
   res.cookies.set("customer_session", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: 30 * 24 * 60 * 60 });
   return res;
 }

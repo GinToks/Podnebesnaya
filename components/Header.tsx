@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, m } from "framer-motion";
-import { Menu, X, ShoppingCart, Heart, Shield, ArrowLeft, User } from "lucide-react";
+import { Menu, X, ShoppingCart, Heart, ArrowLeft, User } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
@@ -28,6 +28,8 @@ export default function Header() {
   const checkAuth = useAdminAuthStore((state) => state.checkAuth);
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const cabinetHref = isAdmin ? "/admin" : "/account";
+  const cabinetLabel = isAdmin ? "Админ" : "Кабинет";
 
   useEffect(() => {
     setMounted(true);
@@ -72,12 +74,12 @@ export default function Header() {
                 </Link>
               )}
               <Link
-                href="/account"
+                href={cabinetHref}
                 className="flex items-center gap-2 p-2 rounded-full hover:bg-mist transition-colors"
                 aria-label="Личный кабинет"
               >
                 <User size={18} strokeWidth={2} />
-                <span className="hidden md:block text-xs font-semibold">Кабинет</span>
+                <span className="hidden md:block text-xs font-semibold">{cabinetLabel}</span>
               </Link>
               <button
                 onClick={() => setWishlistOpen(true)}
@@ -121,16 +123,7 @@ export default function Header() {
                   {mounted ? count : 0}
                 </span>
               </button>
-              {mounted && isAdmin && (
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-2 p-2 rounded-full hover:bg-mist transition-colors text-accent"
-                  aria-label="Админ-панель"
-                >
-                  <Shield size={18} strokeWidth={2} />
-                  <span className="hidden md:block text-xs font-semibold">Админ</span>
-                </Link>
-              )}
+
             </nav>
             <button
               className="md:hidden p-2 rounded-full hover:bg-mist transition-colors"
