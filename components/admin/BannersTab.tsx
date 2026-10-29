@@ -117,7 +117,7 @@ export default function BannersTab({ products }: { products: Product[] }) {
                       setEditingBannerId(null);
                     } else {
                     const checked = Array.from(document.querySelectorAll(".banner-product-check:checked")).map((el) => (el as HTMLInputElement).value);
-                      addBanner({
+                      await addBanner({
                         title,
                         subtitle: subtitle || "",
                         endDate: new Date(endDate).toISOString(),
