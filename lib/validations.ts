@@ -11,7 +11,19 @@ export const productSchema = z.object({
   legend: z.string().optional().default(""),
   accent: z.string().optional().default("#C41E3A"),
   stock: z.number().int().min(0).optional().default(0),
-  images: z.array(z.string()).optional().default([]),
+  images: z
+    .array(
+      z.union([
+        z.string(),
+        z.object({
+          id: z.string().optional(),
+          url: z.string().optional(),
+          alt: z.string().optional(),
+        }),
+      ])
+    )
+    .optional()
+    .default([]),
   notes: z
     .object({
       top: z.array(z.string()).optional().default([]),
