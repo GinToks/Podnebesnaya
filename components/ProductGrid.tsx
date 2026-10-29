@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { Filter, X } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import QuickViewModal from "@/components/QuickViewModal";
@@ -61,14 +61,14 @@ export default function ProductGrid() {
 
   return (
     <section id="catalog" ref={ref} className="py-24 relative overflow-hidden">
-      <motion.div style={{ y }} className="absolute inset-0 pointer-events-none z-0 opacity-8">
+      <m.div style={{ y }} className="absolute inset-0 pointer-events-none z-0 opacity-8">
         <svg viewBox="0 0 1440 400" fill="none" className="w-full h-full">
           <path d="M0 200 Q360 100 720 200 Q1080 300 1440 200" stroke="#6B8A5E" strokeWidth="1.5" fill="none" />
           <circle cx="200" cy="180" r="30" fill="#E8B4B8" opacity="0.2" />
           <circle cx="720" cy="200" r="40" fill="#6B8A5E" opacity="0.15" />
           <circle cx="1200" cy="170" r="25" fill="#2E5C8A" opacity="0.15" />
         </svg>
-      </motion.div>
+      </m.div>
       {/* Sakura petals */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {[...Array(12)].map((_, i) => (

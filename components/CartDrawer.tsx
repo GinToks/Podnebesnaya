@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { X, ShoppingCart, Trash2, ArrowRight, Check, Flame, Tag, Loader2, Gift } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { usePromoStore } from "@/store/promoStore";
@@ -166,7 +166,7 @@ export default function CartDrawer() {
     <AnimatePresence>
       {isOpen ? (
         <>
-          <motion.div
+          <m.div
             key="cart-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -174,7 +174,7 @@ export default function CartDrawer() {
             onClick={close}
             className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px]"
           />
-          <motion.aside
+          <m.aside
             key="cart-drawer"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -202,13 +202,13 @@ export default function CartDrawer() {
                 <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent mx-auto mb-4">
                   <Check size={24} strokeWidth={3} />
                 </div>
-                <motion.h3
+                <m.h3
                   whileInView={{ opacity: 1, y: 0 }}
                   initial={{ opacity: 0, y: 10 }}
                   className="serif text-xl font-light text-ink mb-2"
                 >
                   Заказ оформлен
-                </motion.h3>
+                </m.h3>
                 <p className="text-sm text-ink-muted">
                   Спасибо. Мы свяжемся с вами в ближайшее время.
                 </p>
@@ -274,7 +274,7 @@ export default function CartDrawer() {
                 )}
                 <div className="space-y-5">
                   {items.map((item) => (
-                    <motion.div
+                    <m.div
                       key={item.product.id}
                       className="flex gap-4 items-start"
                     >
@@ -320,7 +320,7 @@ export default function CartDrawer() {
                           </button>
                         </div>
                       </div>
-                    </motion.div>
+                    </m.div>
                   ))}
                 </div>
                 {cartTimer !== null && cartTimer > 0 && (
@@ -487,7 +487,7 @@ export default function CartDrawer() {
               В корзине {totalQuantity()} позиций
             </p>
           </div>
-        </motion.aside>
+        </m.aside>
         </>
       ) : null}
     </AnimatePresence>

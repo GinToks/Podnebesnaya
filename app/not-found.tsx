@@ -1,13 +1,13 @@
 "use client";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Home, ArrowLeft, Search } from "lucide-react";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center relative z-10">
       <div className="text-center px-4">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -35,7 +35,7 @@ export default function NotFound() {
               <Search size={16} /> В каталог
             </Link>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Decorative sakura branch */}
         <div className="absolute bottom-0 left-0 right-0 pointer-events-none opacity-20">

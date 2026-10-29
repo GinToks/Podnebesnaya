@@ -29,7 +29,7 @@ import BannersTab from "@/components/admin/BannersTab";
 import CollectionsTab from "@/components/admin/CollectionsTab";
 import SettingsTab from "@/components/admin/SettingsTab";
 import CatalogTab from "@/components/admin/CatalogTab";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import type { Product, ScentCategory } from "@/data/products";
 
 type AdminTab = "catalog" | "orders" | "promos" | "banners" | "collections" | "categories" | "quiz" | "analytics" | "settings" | "scent-calendar" | "gift-sets" | "giftcards";

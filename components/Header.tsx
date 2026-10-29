@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { Menu, X, ShoppingCart, Heart, Shield, ArrowLeft, User } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -101,7 +101,7 @@ export default function Header() {
                 className="flex items-center gap-2 relative p-2 rounded-full hover:bg-mist transition-colors"
                 aria-label="Корзина"
               >
-                <motion.span
+                <m.span
                   key={count}
                   initial={{ scale: 1.4 }}
                   animate={{ scale: 1 }}
@@ -109,7 +109,7 @@ export default function Header() {
                   className="inline-flex"
                 >
                   <ShoppingCart size={18} strokeWidth={2} />
-                </motion.span>
+                </m.span>
                 <span className="hidden md:block text-xs font-semibold">
                   Корзина
                 </span>
@@ -143,7 +143,7 @@ export default function Header() {
         </div>
         <AnimatePresence>
           {mobileOpen && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, translateY: -10 }}
               animate={{ opacity: 1, translateY: 0 }}
               exit={{ opacity: 0, translateY: -10 }}
@@ -200,7 +200,7 @@ export default function Header() {
                   </button>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

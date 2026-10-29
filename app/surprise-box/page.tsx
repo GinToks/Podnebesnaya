@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Gift, ShoppingCart, Sparkles, PackageOpen } from "lucide-react";
 import Header from "@/components/Header";
 import PromoBanner from "@/components/PromoBanner";
@@ -59,7 +59,7 @@ export default function SurpriseBoxPage() {
             </Link>
 
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8 }}
@@ -92,9 +92,9 @@ export default function SurpriseBoxPage() {
                   <Sparkles className="absolute -top-2 -right-2 text-gold animate-pulse" size={28} />
                   <Sparkles className="absolute bottom-4 -left-4 text-sakura-dark animate-pulse" size={22} />
                 </div>
-              </motion.div>
+              </m.div>
 
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
@@ -159,7 +159,7 @@ export default function SurpriseBoxPage() {
                 <p className="text-xs text-ink-muted mt-4">
                   Нажимая кнопку, вы добавляете 3 случайные свечи в корзину по специальной цене.
                 </p>
-              </motion.div>
+              </m.div>
             </div>
           </div>
         </section>

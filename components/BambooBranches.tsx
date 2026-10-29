@@ -1,5 +1,5 @@
 "use client";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
 interface BambooBranchesProps {
@@ -13,7 +13,7 @@ export default function BambooBranches({ opacity = 0.15, side = "both" }: Bamboo
   const y = useTransform(scrollYProgress, [0, 1], [30, -30]);
 
   return (
-    <motion.div ref={ref} style={{ y }} className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+    <m.div ref={ref} style={{ y }} className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
       {(side === "both" || side === "left") && (
         <svg
           viewBox="0 0 60 400"
@@ -52,6 +52,6 @@ export default function BambooBranches({ opacity = 0.15, side = "both" }: Bamboo
           <ellipse cx="30" cy="300" rx="5" ry="2.5" fill="#7A9A6E" opacity="0.4" />
         </svg>
       )}
-    </motion.div>
+    </m.div>
   );
 }

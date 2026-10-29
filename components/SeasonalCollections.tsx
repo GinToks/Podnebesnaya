@@ -1,5 +1,5 @@
 "use client";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { useEffect } from "react";
 import { useCollectionStore } from "@/store/collectionStore";
@@ -35,14 +35,14 @@ export default function SeasonalCollections() {
 
   return (
     <section ref={ref} className="py-24 bg-bg-elevated/60 relative overflow-hidden">
-      <motion.div style={{ y }} className="absolute inset-0 pointer-events-none z-0 opacity-10">
+      <m.div style={{ y }} className="absolute inset-0 pointer-events-none z-0 opacity-10">
         <svg viewBox="0 0 1440 400" fill="none" className="w-full h-full">
           <path d="M0 150 Q360 50 720 150 Q1080 250 1440 150" stroke="#E8B4B8" strokeWidth="2" fill="none" />
           <path d="M0 300 Q360 200 720 300 Q1080 400 1440 300" stroke="#6B8A5E" strokeWidth="1.5" fill="none" />
           <circle cx="300" cy="180" r="50" fill="#B89B5E" opacity="0.2" />
           <circle cx="900" cy="220" r="40" fill="#E8B4B8" opacity="0.2" />
         </svg>
-      </motion.div>
+      </m.div>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12">
           <span className="inline-block py-1 px-3 rounded-full border border-sakura text-sakura-dark text-[11px] font-semibold uppercase tracking-widest mb-4">
@@ -56,7 +56,7 @@ export default function SeasonalCollections() {
           {collections.map((collection) => {
             const collectionProducts = products.filter((p) => collection.productIds.includes(p.id));
             return (
-              <motion.div
+              <m.div
                 key={collection.id}
                 whileInView={{ opacity: 1, y: 0 }}
                 initial={{ opacity: 0, y: 20 }}
@@ -100,7 +100,7 @@ export default function SeasonalCollections() {
                 >
                   Смотреть коллекцию <ChevronRight size={14} />
                 </Link>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

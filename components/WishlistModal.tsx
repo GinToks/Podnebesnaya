@@ -1,5 +1,5 @@
 "use client";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { X, Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useCartStore } from "@/store/cartStore";
@@ -31,14 +31,14 @@ export default function WishlistModal({ isOpen, onClose }: WishlistModalProps) {
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
             className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
           />
-          <motion.div
+          <m.div
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -137,7 +137,7 @@ export default function WishlistModal({ isOpen, onClose }: WishlistModalProps) {
                 </div>
               </div>
             )}
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>

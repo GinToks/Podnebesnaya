@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Repeat, ShoppingCart, Sparkles, Check } from "lucide-react";
 import Header from "@/components/Header";
 import PromoBanner from "@/components/PromoBanner";
@@ -97,7 +97,7 @@ export default function SubscriptionPage() {
                 const originalTotal = BASE_PRICE * tier.months;
                 const savings = originalTotal - total;
                 return (
-                  <motion.div
+                  <m.div
                     key={tier.months}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -169,7 +169,7 @@ export default function SubscriptionPage() {
                         </>
                       )}
                     </button>
-                  </motion.div>
+                  </m.div>
                 );
               })}
             </div>

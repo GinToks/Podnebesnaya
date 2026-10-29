@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { X, ChevronRight, ShoppingCart, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useCatalogStore } from "@/store/catalogStore";
@@ -66,14 +66,14 @@ export default function QuizModal({ isOpen, onClose }: QuizModalProps) {
   return (
     <AnimatePresence>
       {isOpen ? (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.96 }}
@@ -221,8 +221,8 @@ export default function QuizModal({ isOpen, onClose }: QuizModalProps) {
                 </div>
               </div>
             )}
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       ) : null}
     </AnimatePresence>
   );

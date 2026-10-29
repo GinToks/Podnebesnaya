@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import Image from "next/image";
 import type { ProductImage } from "@/data/products";
 
@@ -62,7 +62,7 @@ export default function ProductGallery({
         )}
       </div>
       <div className="flex-1">
-        <motion.div
+        <m.div
           whileHover={{ scale: 1.02 }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
@@ -84,7 +84,7 @@ export default function ProductGallery({
               </svg>
             </div>
           )}
-        </motion.div>
+        </m.div>
       </div>
       <div className="flex gap-1 flex-col">
         {(images || []).slice(1).map((image) => (

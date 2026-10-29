@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 // Chibi character SVG components - pastel watercolor style matching site aesthetic
 

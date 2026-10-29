@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 interface Ripple {
   id: number;
@@ -44,7 +44,7 @@ export default function RippleButton({
     >
       {children}
       {ripples.map((r) => (
-        <motion.span
+        <m.span
           key={r.id}
           className="pointer-events-none absolute rounded-full bg-white/40"
           style={{ left: r.x, top: r.y, width: 12, height: 12, marginLeft: -6, marginTop: -6 }}

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { useCatalogStore } from "@/store/catalogStore";
 import Link from "next/link";
@@ -24,14 +24,14 @@ export default function ScentMap() {
 
   return (
     <section ref={ref} className="py-24 bg-bg-elevated/60 relative overflow-hidden">
-      <motion.div style={{ y }} className="absolute inset-0 pointer-events-none z-0 opacity-10">
+      <m.div style={{ y }} className="absolute inset-0 pointer-events-none z-0 opacity-10">
         <svg viewBox="0 0 1440 400" fill="none" className="w-full h-full">
           <path d="M0 180 Q360 80 720 180 Q1080 280 1440 180" stroke="#2E5C8A" strokeWidth="2" fill="none" />
           <path d="M0 280 Q360 180 720 280 Q1080 380 1440 280" stroke="#E8B4B8" strokeWidth="1.5" fill="none" />
           <circle cx="400" cy="200" r="60" fill="#2E5C8A" opacity="0.15" />
           <circle cx="1000" cy="180" r="45" fill="#E8B4B8" opacity="0.15" />
         </svg>
-      </motion.div>
+      </m.div>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12">
           <span className="inline-block py-1 px-3 rounded-full border border-sakura text-sakura-dark text-[11px] font-semibold uppercase tracking-widest mb-4">
@@ -48,7 +48,7 @@ export default function ScentMap() {
         {/* Scent category buttons */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {scentCategories.map((cat) => (
-            <motion.button
+            <m.button
               key={cat.id}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -65,13 +65,13 @@ export default function ScentMap() {
               <span className="text-xs text-ink-muted mt-2 block">
                 {products.filter((p) => p.category === cat.id).length} товаров
               </span>
-            </motion.button>
+            </m.button>
           ))}
         </div>
 
         {/* Filtered products */}
         {active && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="grid md:grid-cols-2 lg:grid-cols-4 gap-4"
@@ -91,7 +91,7 @@ export default function ScentMap() {
                 Товаров в этой категории пока нет
               </p>
             )}
-          </motion.div>
+          </m.div>
         )}
       </div>
     </section>

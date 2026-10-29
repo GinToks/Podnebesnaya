@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import type { Product } from "@/data/products";
 
 interface RelatedProductsProps {
@@ -22,7 +22,7 @@ export default function RelatedProducts({
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {related.map((product) => (
-            <motion.div
+            <m.div
               key={product.id}
               whileInView={{ y: [20, 0], opacity: [0, 1], transition: { duration: 0.6 } }}
               initial={{ y: 20, opacity: 0 }}
@@ -50,7 +50,7 @@ export default function RelatedProducts({
                   {product.price.toLocaleString("ru-RU")} ₽
                 </span>
               </Link>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useCatalogStore } from "@/store/catalogStore";
 import { useCartStore } from "@/store/cartStore";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ArrowLeft, ShoppingCart, Plus, Minus } from "lucide-react";
 import Link from "next/link";
 import ProductGallery from "@/components/ProductGallery";
@@ -130,20 +130,20 @@ export default function ProductDetailPage() {
             )}
           </div>
           <div>
-            <motion.h1
+            <m.h1
               whileInView={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 14 }}
               viewport={{ once: true }}
               className="serif text-4xl sm:text-5xl font-light tracking-[0.1em] leading-tight text-ink mb-4"
             >
               {product.name}
-            </motion.h1>
+            </m.h1>
             {product.offer?.active && (
               <span className="inline-block py-1 px-3 rounded-full border border-sky/50 text-accent text-[11px] font-semibold uppercase tracking-widest mb-6">
                 {product.offer.label}
               </span>
             )}
-            <motion.p
+            <m.p
               whileInView={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 14 }}
               transition={{ delay: 0.1, duration: 0.7 }}
@@ -151,7 +151,7 @@ export default function ProductDetailPage() {
               className="text-lg text-ink-muted leading-relaxed mb-8 max-w-xl"
             >
               {product.fullDescription}
-            </motion.p>
+            </m.p>
             <div className="space-y-4 mb-8">
               <div className="flex items-center gap-3 text-sm text-ink-muted">
                 <span className="font-medium text-ink">Категория:</span>

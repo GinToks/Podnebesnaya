@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
 import { Shield, Lock } from "lucide-react";
@@ -24,7 +24,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg relative z-10">
-      <motion.form
+      <m.form
         onSubmit={handleSubmit}
         className="w-full max-w-sm p-8 bg-bg border border-mist rounded-xl shadow-sm"
         initial={{ opacity: 0, y: 20 }}
@@ -62,7 +62,7 @@ export default function AdminLoginPage() {
             Войти <Lock size={16} strokeWidth={2} />
           </button>
         </div>
-      </motion.form>
+      </m.form>
     </div>
   );
 }

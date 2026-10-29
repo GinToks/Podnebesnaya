@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { useReducedMotion } from "framer-motion";
 import { useThemeStore } from "@/store/themeStore";
 import Link from "next/link";
@@ -35,7 +35,7 @@ export default function Hero() {
         </div>
       )}
       {/* Decorative bamboo branches */}
-      <motion.div style={{ y: y1 }} className="absolute left-0 top-0 bottom-0 w-16 pointer-events-none opacity-50">
+      <m.div style={{ y: y1 }} className="absolute left-0 top-0 bottom-0 w-16 pointer-events-none opacity-50">
         <svg viewBox="0 0 60 800" fill="none" className="h-full w-full">
           <path d="M30 0 Q25 100 30 200 Q35 300 28 400 Q22 500 30 600 Q38 700 30 800" stroke="#7A9A6E" strokeWidth="3" fill="none" />
           <path d="M30 100 Q10 90 5 80" stroke="#7A9A6E" strokeWidth="1.5" fill="none" />
@@ -44,8 +44,8 @@ export default function Hero() {
           <path d="M30 550 Q50 540 55 530" stroke="#7A9A6E" strokeWidth="1.5" fill="none" />
           <path d="M30 700 Q10 690 5 680" stroke="#7A9A6E" strokeWidth="1.5" fill="none" />
         </svg>
-      </motion.div>
-      <motion.div style={{ y: y2 }} className="absolute right-0 top-0 bottom-0 w-16 pointer-events-none opacity-50">
+      </m.div>
+      <m.div style={{ y: y2 }} className="absolute right-0 top-0 bottom-0 w-16 pointer-events-none opacity-50">
         <svg viewBox="0 0 60 800" fill="none" className="h-full w-full">
           <path d="M30 0 Q35 100 30 200 Q25 300 32 400 Q38 500 30 600 Q22 700 30 800" stroke="#7A9A6E" strokeWidth="3" fill="none" />
           <path d="M30 150 Q50 140 55 130" stroke="#7A9A6E" strokeWidth="1.5" fill="none" />
@@ -54,7 +54,7 @@ export default function Hero() {
           <path d="M30 600 Q10 590 5 580" stroke="#7A9A6E" strokeWidth="1.5" fill="none" />
           <path d="M30 750 Q50 740 55 730" stroke="#7A9A6E" strokeWidth="1.5" fill="none" />
         </svg>
-      </motion.div>
+      </m.div>
 
       {/* Falling seasonal particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -105,11 +105,11 @@ export default function Hero() {
             <span className="inline-block py-1 px-3 rounded-full border border-sakura text-sakura-dark text-[11px] font-semibold uppercase tracking-widest mb-4">
               Новая коллекция
             </span>
-            <motion.h1
+            <m.h1
               className="serif text-4xl sm:text-5xl lg:text-6xl font-light tracking-[0.12em] leading-tight mt-6 mb-6 text-ink"
             >
               {"Тихая гармония".split("").map((ch, i) => (
-                <motion.span
+                <m.span
                   key={i}
                   initial={reduceMotion ? false : { opacity: 0, y: 24 }}
                   animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
@@ -117,10 +117,10 @@ export default function Hero() {
                   className="inline-block"
                 >
                   {ch === " " ? "\u00A0" : ch}
-                </motion.span>
+                </m.span>
               ))}
-            </motion.h1>
-            <motion.p
+            </m.h1>
+            <m.p
               whileInView={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 20 }}
               transition={{ delay: 0.2, duration: 0.8 }}
@@ -128,8 +128,8 @@ export default function Hero() {
               className="text-lg text-ink-muted max-w-lg leading-relaxed mb-10"
             >
               Соединение азиатской философии и ароматов. Каждая свеча — это минутка тишины, огня и тумана. Вдохновлено красотой сакуры и спокойствием дзен-садов.
-            </motion.p>
-            <motion.div
+            </m.p>
+            <m.div
               whileInView={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 20 }}
               transition={{ delay: 0.35, duration: 0.8 }}
@@ -157,7 +157,7 @@ export default function Hero() {
               >
                 Подобрать аромат
               </button>
-            </motion.div>
+            </m.div>
           </div>
           <div className="relative h-64 sm:h-80 lg:h-96 flex items-center justify-center">
             <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-lg">

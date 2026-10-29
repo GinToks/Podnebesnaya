@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 export default function FlameAnimation({ className = "" }: { className?: string }) {
   return (
@@ -11,7 +11,7 @@ export default function FlameAnimation({ className = "" }: { className?: string 
         {/* Wick */}
         <line x1="30" y1="60" x2="30" y2="50" stroke="#3D2B1F" strokeWidth="1.5" strokeLinecap="round" />
         {/* Flame */}
-        <motion.g
+        <m.g
           animate={{
             scaleY: [1, 1.15, 0.95, 1.1, 1],
             scaleX: [1, 0.9, 1.05, 0.95, 1],
@@ -21,7 +21,7 @@ export default function FlameAnimation({ className = "" }: { className?: string 
           style={{ originX: "30px", originY: "50px" }}
         >
           {/* Outer flame */}
-          <motion.path
+          <m.path
             d="M30 50 Q24 38 26 28 Q30 20 30 15 Q30 20 34 28 Q36 38 30 50Z"
             fill="#E8B4B8"
             opacity={0.6}
@@ -29,7 +29,7 @@ export default function FlameAnimation({ className = "" }: { className?: string 
             transition={{ duration: 2, repeat: Infinity }}
           />
           {/* Middle flame */}
-          <motion.path
+          <m.path
             d="M30 50 Q26 40 27 32 Q30 25 30 22 Q30 25 33 32 Q34 40 30 50Z"
             fill="#D4949A"
             opacity={0.8}
@@ -37,13 +37,13 @@ export default function FlameAnimation({ className = "" }: { className?: string 
             transition={{ duration: 1.8, repeat: Infinity }}
           />
           {/* Inner flame */}
-          <motion.path
+          <m.path
             d="M30 50 Q28 42 29 36 Q30 30 30 28 Q30 30 31 36 Q32 42 30 50Z"
             fill="#F5F0E8"
             opacity={0.9}
           />
           {/* Glow */}
-          <motion.circle
+          <m.circle
             cx="30"
             cy="35"
             r="12"
@@ -52,7 +52,7 @@ export default function FlameAnimation({ className = "" }: { className?: string 
             animate={{ r: [10, 14, 10], opacity: [0.1, 0.2, 0.1] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
-        </motion.g>
+        </m.g>
       </svg>
     </div>
   );

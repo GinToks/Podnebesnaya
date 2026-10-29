@@ -1,5 +1,5 @@
 "use client";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { Flame, Cloud, Moon } from "lucide-react";
 
@@ -28,7 +28,7 @@ export default function Philosophy() {
   return (
     <section id="philosophy" ref={ref} className="py-24 bg-bg-elevated/60 relative overflow-hidden">
       {/* Parallax background */}
-      <motion.div style={{ y }} className="absolute inset-0 pointer-events-none z-0 opacity-10">
+      <m.div style={{ y }} className="absolute inset-0 pointer-events-none z-0 opacity-10">
         <svg viewBox="0 0 1440 400" fill="none" className="w-full h-full">
           <path d="M0 200 Q360 100 720 200 Q1080 300 1440 200" stroke="#6B8A5E" strokeWidth="2" fill="none" />
           <path d="M0 250 Q360 150 720 250 Q1080 350 1440 250" stroke="#E8B4B8" strokeWidth="1.5" fill="none" />
@@ -36,7 +36,7 @@ export default function Philosophy() {
           <circle cx="720" cy="200" r="60" fill="#6B8A5E" opacity="0.2" />
           <circle cx="1200" cy="170" r="35" fill="#2E5C8A" opacity="0.2" />
         </svg>
-      </motion.div>
+      </m.div>
       {/* Sakura petals */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {[...Array(15)].map((_, i) => (
@@ -62,15 +62,15 @@ export default function Philosophy() {
           <span className="inline-block py-1 px-3 rounded-full border border-sakura text-sakura-dark text-[11px] font-semibold uppercase tracking-widest mb-4">
             Философия
           </span>
-          <motion.h2
+          <m.h2
             whileInView={{ opacity: 1, y: 0 }}
             initial={{ opacity: 0, y: 14 }}
             viewport={{ once: true }}
             className="serif text-3xl sm:text-4xl font-light tracking-[0.1em] mt-4 mb-6 text-ink"
           >
             Между огнём и туманом
-          </motion.h2>
-          <motion.p
+          </m.h2>
+          <m.p
             whileInView={{ opacity: 1, y: 0 }}
             initial={{ opacity: 0, y: 14 }}
             transition={{ delay: 0.15, duration: 0.7 }}
@@ -78,7 +78,7 @@ export default function Philosophy() {
             className="text-ink-muted leading-relaxed"
           >
             Мы верим, что аромат способен перенести в другое состояние. Поднебесная — это свечи, созданные в духе азиатской философии: спокойствие, внимание к детали и уважение к природе.
-          </motion.p>
+          </m.p>
         </div>
         <div className="grid md:grid-cols-3 gap-10">
           {symbols.map((symbol, idx) => {
@@ -89,7 +89,7 @@ export default function Philosophy() {
             ];
             const colorClass = colorClasses[idx % colorClasses.length];
             return (
-              <motion.div
+              <m.div
                 key={symbol.label}
                 whileInView={{ opacity: 1, y: 0, transition: { duration: 0.6 } }}
                 initial={{ opacity: 0, y: 14 }}
@@ -105,7 +105,7 @@ export default function Philosophy() {
                 <p className="text-sm text-ink-muted text-center leading-relaxed max-w-xs">
                   {symbol.text}
                 </p>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

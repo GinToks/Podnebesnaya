@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { X, ShoppingCart, Plus, Minus } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import Link from "next/link";
@@ -38,14 +38,14 @@ export default function QuickViewModal({
   return (
     <AnimatePresence>
       {isOpen ? (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.96 }}
@@ -79,15 +79,15 @@ export default function QuickViewModal({
                   {product.offer.label}
                 </span>
               )}
-              <motion.h1
+              <m.h1
                 whileInView={{ opacity: 1, y: 0 }}
                 initial={{ opacity: 0, y: 10 }}
                 viewport={{ once: true }}
                 className="serif text-2xl sm:text-3xl font-light tracking-[0.08em] leading-tight text-ink mb-2"
               >
                 {product.name}
-              </motion.h1>
-              <motion.p
+              </m.h1>
+              <m.p
                 whileInView={{ opacity: 1, y: 0 }}
                 initial={{ opacity: 0, y: 10 }}
                 transition={{ delay: 0.1, duration: 0.6 }}
@@ -95,7 +95,7 @@ export default function QuickViewModal({
                 className="text-base text-ink-muted leading-relaxed mb-4 max-w-md"
               >
                 {product.description}
-              </motion.p>
+              </m.p>
               <div className="space-y-3 mb-8">
                 {notes.map((note) => (
                   <span
@@ -175,8 +175,8 @@ export default function QuickViewModal({
                 Подробнее о товаре →
               </Link>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       ) : null}
     </AnimatePresence>
   );

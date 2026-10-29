@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { X, Gift } from "lucide-react";
 import Link from "next/link";
 
@@ -24,14 +24,14 @@ export default function ExitIntentPopup() {
     <AnimatePresence>
       {show && (
         <>
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShow(false)}
             className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
           />
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -60,7 +60,7 @@ export default function ExitIntentPopup() {
                 В каталог
               </Link>
             </div>
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>

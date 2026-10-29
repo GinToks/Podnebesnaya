@@ -18,6 +18,7 @@ import ExitIntentPopup from "@/components/ExitIntentPopup";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import InitialLoader from "@/components/InitialLoader";
 import PageTransition from "@/components/PageTransition";
+import MotionProvider from "@/components/MotionProvider";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -91,7 +92,9 @@ export default function RootLayout({
           <ExitIntentPopup />
           <ErrorBoundary>
             <InitialLoader>
-              <PageTransition>{children}</PageTransition>
+              <MotionProvider>
+                <PageTransition>{children}</PageTransition>
+              </MotionProvider>
             </InitialLoader>
           </ErrorBoundary>
           <Toast />

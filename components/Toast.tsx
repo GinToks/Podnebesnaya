@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { CheckCircle, AlertCircle, Info } from "lucide-react";
 import { useToastStore } from "@/store/toastStore";
 
@@ -32,7 +32,7 @@ export default function Toast() {
     <div className="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none">
       <AnimatePresence>
         {toasts.map((toast) => (
-          <motion.div
+          <m.div
             key={toast.id}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -55,7 +55,7 @@ export default function Toast() {
             >
               <span className="text-[10px]">✕</span>
             </button>
-          </motion.div>
+          </m.div>
         ))}
       </AnimatePresence>
     </div>

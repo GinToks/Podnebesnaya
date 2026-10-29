@@ -1,10 +1,10 @@
 "use client";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 export default function LoadingAnimation() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg">
-      <motion.div
+      <m.div
         animate={{ rotate: 360 }}
         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
       >
@@ -13,7 +13,7 @@ export default function LoadingAnimation() {
           <path d="M32 28 Q42 36 32 56 Q22 36 32 28Z" fill="#D4949A" opacity="0.6" />
           <circle cx="32" cy="32" r="4" fill="#B89B5E" opacity="0.8" />
         </svg>
-      </motion.div>
+      </m.div>
     </div>
   );
 }
