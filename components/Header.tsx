@@ -101,7 +101,15 @@ export default function Header() {
                 className="flex items-center gap-2 relative p-2 rounded-full hover:bg-mist transition-colors"
                 aria-label="Корзина"
               >
-                <ShoppingCart size={18} strokeWidth={2} />
+                <motion.span
+                  key={count}
+                  initial={{ scale: 1.4 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                  className="inline-flex"
+                >
+                  <ShoppingCart size={18} strokeWidth={2} />
+                </motion.span>
                 <span className="hidden md:block text-xs font-semibold">
                   Корзина
                 </span>

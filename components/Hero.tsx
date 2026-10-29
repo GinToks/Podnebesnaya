@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import { useThemeStore } from "@/store/themeStore";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +15,7 @@ export default function Hero() {
   const [mounted, setMounted] = useState(false);
   const [quizOpen, setQuizOpen] = useState(false);
   const season = useThemeStore((state) => state.season);
+  const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 300], [0, 200]);
   const y2 = useTransform(scrollY, [0, 300], [0, -150]);
@@ -23,7 +25,15 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative py-16 sm:py-20 lg:py-24">
+    <section className="relative py-16 sm:py-20 lg:py-24 overflow-hidden">
+      {/* Soft bokeh glow background */}
+      {!reduceMotion && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          <div className="bokeh-blob bg-sakura/40 w-56 h-56 top-10 left-1/4" style={{ animationDelay: "0s" }} />
+          <div className="bokeh-blob bg-gold/30 w-72 h-72 bottom-10 right-1/3" style={{ animationDelay: "2s" }} />
+          <div className="bokeh-blob bg-olive/25 w-48 h-48 top-1/2 right-10" style={{ animationDelay: "4s" }} />
+        </div>
+      )}
       {/* Decorative bamboo branches */}
       <motion.div style={{ y: y1 }} className="absolute left-0 top-0 bottom-0 w-16 pointer-events-none opacity-50">
         <svg viewBox="0 0 60 800" fill="none" className="h-full w-full">
@@ -96,12 +106,19 @@ export default function Hero() {
               Новая коллекция
             </span>
             <motion.h1
-              whileInView={{ opacity: 1, y: 0 }}
-              initial={{ opacity: 0, y: 20 }}
-              viewport={{ once: true }}
               className="serif text-4xl sm:text-5xl lg:text-6xl font-light tracking-[0.12em] leading-tight mt-6 mb-6 text-ink"
             >
-              Тихая гармония
+              {"Тихая гармония".split("").map((ch, i) => (
+                <motion.span
+                  key={i}
+                  initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+                  animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                  transition={{ delay: reduceMotion ? 0 : 0.04 * i, duration: 0.5, ease: "easeOut" }}
+                  className="inline-block"
+                >
+                  {ch === " " ? "\u00A0" : ch}
+                </motion.span>
+              ))}
             </motion.h1>
             <motion.p
               whileInView={{ opacity: 1, y: 0 }}

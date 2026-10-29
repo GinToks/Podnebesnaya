@@ -14,6 +14,23 @@ export default function ProductGallery({
   mainImage,
   onSelect,
 }: ProductGalleryProps) {
+  let touchStartX = 0;
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX = e.changedTouches[0]?.clientX ?? 0;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const endX = e.changedTouches[0]?.clientX ?? 0;
+    const delta = endX - touchStartX;
+    if (Math.abs(delta) < 40) return;
+    const idx = (images || []).findIndex((img) => img.id === mainImage?.id);
+    if (idx < 0) return;
+    const nextIdx = delta < 0
+      ? Math.min(idx + 1, (images || []).length - 1)
+      : Math.max(idx - 1, 0);
+    const next = (images || [])[nextIdx];
+    if (next && next.id !== mainImage?.id) onSelect(next);
+  };
+
   if (!mainImage) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-mist">
@@ -47,6 +64,8 @@ export default function ProductGallery({
       <div className="flex-1">
         <motion.div
           whileHover={{ scale: 1.02 }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           className="relative h-[420px] rounded-xl overflow-hidden bg-mist border border-mist"
         >
           {mainImage.url ? (

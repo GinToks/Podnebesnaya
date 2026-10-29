@@ -17,6 +17,7 @@ import BambooDecor from "@/components/BambooDecor";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import InitialLoader from "@/components/InitialLoader";
+import PageTransition from "@/components/PageTransition";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -89,7 +90,9 @@ export default function RootLayout({
           <CustomCursor />
           <ExitIntentPopup />
           <ErrorBoundary>
-            <InitialLoader>{children}</InitialLoader>
+            <InitialLoader>
+              <PageTransition>{children}</PageTransition>
+            </InitialLoader>
           </ErrorBoundary>
           <Toast />
           </ThemeProvider>

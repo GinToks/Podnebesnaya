@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { Plus, Check, ExternalLink, Heart } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
@@ -30,13 +30,32 @@ export default function ProductCard({
 
   const notes = product?.notes ? [...product.notes.top, ...product.notes.middle, ...product.notes.base] : [];
   const inStock = product.stock > 0;
+  const reduceMotion = useReducedMotion();
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [8, -8]), { stiffness: 220, damping: 24 });
+  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-8, 8]), { stiffness: 220, damping: 24 });
+
+  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (reduceMotion) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    mx.set((e.clientX - rect.left) / rect.width - 0.5);
+    my.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+  const handleLeave = () => {
+    mx.set(0);
+    my.set(0);
+  };
 
   return (
     <motion.div
+      style={reduceMotion ? undefined : { rotateX, rotateY, transformPerspective: 900 }}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
       whileInView={{ y: [40, 0], opacity: [0, 1], scale: [0.95, 1], transition: { duration: 0.6, ease: "easeOut" } }}
       initial={{ y: 40, opacity: 0, scale: 0.95 }}
       viewport={{ once: true }}
-      whileHover={{ y: -4, scale: 1.01 }}
+      whileHover={reduceMotion ? undefined : { y: -6, scale: 1.02 }}
       className="glass-card card-sakura-border p-4 flex flex-col group cursor-pointer w-full aspect-square"
       onClick={() => onQuickView?.(product)}
     >
@@ -83,7 +102,8 @@ export default function ProductCard({
             </div>
           )}
         </div>
-        <button
+        <motion.button
+          whileTap={{ scale: 0.85 }}
           onClick={(e) => {
             e.stopPropagation();
             if (inWishlist) removeFromWishlist(product.id);
@@ -92,8 +112,15 @@ export default function ProductCard({
           className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-bg-elevated/80 backdrop-blur border border-mist flex items-center justify-center transition-colors"
           aria-label={inWishlist ? "Удалить из избранного" : "Добавить в избранное"}
         >
-          <Heart size={14} className={inWishlist ? "text-sakura-dark fill-sakura-dark" : "text-ink-muted"} />
-        </button>
+          <motion.span
+            key={inWishlist ? "in" : "out"}
+            initial={{ scale: 0.6 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+          >
+            <Heart size={14} className={inWishlist ? "text-sakura-dark fill-sakura-dark" : "text-ink-muted"} />
+          </motion.span>
+        </motion.button>
         <h3 className="serif text-sm font-light tracking-[0.06em] text-ink mb-1 line-clamp-1">
           {product.name}
         </h3>
@@ -109,7 +136,8 @@ export default function ProductCard({
               {product.price.toLocaleString("ru-RU")} ₽
             </span>
           </div>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.92 }}
             onClick={(e) => {
               e.stopPropagation();
               handleAdd();
@@ -122,7 +150,7 @@ export default function ProductCard({
           >
             {added ? <Check size={10} strokeWidth={2.5} /> : <Plus size={10} strokeWidth={2.5} />}
             <span>{!inStock ? "Нет" : added ? "✓" : "В корзину"}</span>
-          </button>
+          </motion.button>
         </div>
         <Link
           href={`/product/${product.id}`}
