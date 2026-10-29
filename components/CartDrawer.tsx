@@ -40,6 +40,12 @@ function CartDrawer() {
   const abandonedSent = useRef(false);
   const [giftWrap, setGiftWrap] = useState(false);
   useEffect(() => {
+    if (appliedPromo && items.some((i) => i.product.id === "surprise-box")) {
+      setAppliedPromo(null);
+      addToast({ type: "info", title: "Промокод снят: не применяется к сюрприз-боксам" });
+    }
+  }, [items, appliedPromo]);
+  useEffect(() => {
     if (cartTimer === 0 && items.length > 0 && !abandonedSent.current) {
       abandonedSent.current = true;
       fetch("/api/cart/abandoned", {
@@ -138,6 +144,10 @@ function CartDrawer() {
   };
 
   const applyPromo = () => {
+    if (items.some((i) => i.product.id === "surprise-box")) {
+      addToast({ type: "error", title: "Промокод не применяется к сюрприз-боксам" });
+      return;
+    }
     const code = codes.find((c) => c.code.toUpperCase() === promoCode.toUpperCase().trim());
     if (!code) {
       addToast({ type: "error", title: "Промокод не найден" });
