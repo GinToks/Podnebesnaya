@@ -26,6 +26,9 @@ export async function getStoredPassword(): Promise<string> {
       if (v) return v;
     }
   } catch {}
+  if (process.env.NODE_ENV === "production") {
+    return process.env.ADMIN_PASSWORD || "";
+  }
   return process.env.ADMIN_PASSWORD || "admin123";
 }
 

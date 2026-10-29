@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, memo } from "react";
 import Link from "next/link";
 import { m, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
 import Image from "next/image";
@@ -13,7 +13,7 @@ interface ProductCardProps {
   onQuickView?: (product: Product) => void;
 }
 
-export default function ProductCard({
+function ProductCard({
   product,
   onQuickView,
 }: ProductCardProps) {
@@ -163,3 +163,5 @@ export default function ProductCard({
     </m.div>
   );
 }
+
+export default memo(ProductCard);

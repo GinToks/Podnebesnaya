@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
+import { bannerSchema, bannerUpdateSchema } from "@/lib/validations";
 
 const KEY = "promo_banners";
 
@@ -62,10 +63,12 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const body = await req.json();
+  const body = await req.json().catch(() => ({}));
+  const parsed = bannerSchema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   const banners = await readBanners();
   const id = `pb-${Date.now()}`;
-  const banner = { ...body, id };
+  const banner = { ...parsed.data, id };
   banners.push(banner);
   await writeBanners(banners);
   return NextResponse.json(banner, { status: 201 });
@@ -73,8 +76,10 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const body = await req.json();
-  const { id, ...updates } = body;
+  const body = await req.json().catch(() => ({}));
+  const parsed = bannerUpdateSchema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  const { id, ...updates } = parsed.data;
   const banners = await readBanners();
   const idx = banners.findIndex((b: any) => b.id === id);
   if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -85,7 +90,9 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { id } = await req.json();
+  const body = await req.json().catch(() => ({}));
+  const id = String(body.id || "");
+  if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
   const banners = await readBanners();
   const filtered = banners.filter((b: any) => b.id !== id);
   await writeBanners(filtered);

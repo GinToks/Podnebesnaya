@@ -38,12 +38,25 @@ export interface Order {
   createdAt: string;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   await ensureOrderColumns();
+  const url = new URL(req.url);
+  const limit = Number(url.searchParams.get("limit"));
+  const offset = Number(url.searchParams.get("offset") || "0");
+  const hasPagination = Number.isFinite(limit) && limit > 0;
+
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
+    skip: hasPagination ? Math.max(0, offset) : undefined,
+    take: hasPagination ? limit : undefined,
   });
-  return NextResponse.json(orders.map(parseOrder));
+  const parsed = orders.map(parseOrder);
+
+  if (hasPagination) {
+    const total = await prisma.order.count();
+    return NextResponse.json({ items: parsed, total, limit, offset: Math.max(0, offset) });
+  }
+  return NextResponse.json(parsed);
 }
 
 function parseOrder(o: any) {
@@ -160,14 +173,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const body = await req.json();
+  const body = await req.json().catch(() => ({}));
   const parsed = orderStatusSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
-  const { id, status } = parsed.data;
+  const { id, status, trackingNumber } = parsed.data;
   const data: any = { status };
-  if (body.trackingNumber !== undefined) data.trackingNumber = body.trackingNumber || null;
+  if (trackingNumber !== undefined) data.trackingNumber = trackingNumber || null;
   const order = await prisma.order.update({
     where: { id },
     data,
@@ -176,7 +189,9 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const { id } = await req.json();
+  const body = await req.json().catch(() => ({}));
+  const id = String(body.id || "");
+  if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
   await prisma.order.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }

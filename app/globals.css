@@ -190,6 +190,10 @@
   }
 }
 
+@media (pointer: coarse) {
+  body { cursor: auto; }
+}
+
 @layer components {
   .gold-line {
     position: relative;

@@ -3,6 +3,9 @@ import { SignJWT, jwtVerify } from "jose";
 if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
   console.warn("[security] JWT_SECRET is not set in production; falling back to ADMIN_PASSWORD. Set JWT_SECRET for stronger security.");
 }
+if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET && !process.env.ADMIN_PASSWORD) {
+  console.error("[security] JWT_SECRET or ADMIN_PASSWORD must be set in production");
+}
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || process.env.ADMIN_PASSWORD || "change-me-in-production"
 );

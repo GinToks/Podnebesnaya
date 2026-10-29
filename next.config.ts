@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  output: "standalone",
+  compress: true,
+  experimental: {
+    optimizePackageImports: ["framer-motion", "lucide-react"],
+  },
   typescript: {
     ignoreBuildErrors: false,
   },

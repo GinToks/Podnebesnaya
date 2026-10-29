@@ -49,6 +49,7 @@ export const orderSchema = z.object({
 export const orderStatusSchema = z.object({
   id: z.string(),
   status: z.enum(["new", "processing", "completed", "cancelled"]),
+  trackingNumber: z.string().max(100).optional().nullable(),
 });
 export const reviewSchema = z.object({
   productId: z.string().min(1),
@@ -81,4 +82,23 @@ export const messengerSettingsSchema = z.object({
   tgToken: z.string().max(200).optional().default(""),
   tgChatId: z.string().max(100).optional().default(""),
   waNumber: z.string().max(50).optional().default(""),
+});
+
+export const bannerSchema = z.object({
+  title: z.string().min(1).max(200),
+  subtitle: z.string().max(500).optional().default(""),
+  endDate: z.string().optional(),
+  bgColor: z.string().max(20).optional().default("#E8B4B8"),
+  textColor: z.string().max(20).optional().default("#3D2B1F"),
+  active: z.boolean().optional().default(true),
+  link: z.string().max(500).optional().default("#catalog"),
+  linkText: z.string().max(50).optional().default("Смотреть"),
+});
+
+export const bannerUpdateSchema = bannerSchema.partial().extend({ id: z.string().min(1) });
+
+
+export const giftCardCreateSchema = z.object({
+  amount: z.number().int().positive(),
+  code: z.string().min(1).max(64).optional(),
 });

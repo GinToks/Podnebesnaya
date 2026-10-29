@@ -87,7 +87,11 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   await ensureProductColumns();
-  const { id, ...patch } = await req.json();
+  const body = await req.json().catch(() => ({}));
+  if (!body.id) return NextResponse.json({ error: "id required" }, { status: 400 });
+  const parsed = productSchema.partial().safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  const { id, ...patch } = parsed.data as any;
   const data: any = {};
   if (patch.name !== undefined) data.name = patch.name;
   if (patch.description !== undefined) data.description = patch.description;
@@ -109,7 +113,9 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const { id } = await req.json();
+  const body = await req.json().catch(() => ({}));
+  const id = String(body.id || "");
+  if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
   await prisma.product.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }

@@ -64,7 +64,7 @@ export default function SakuraPetals() {
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
-      {[...Array(40)].map((_, i) => {
+      {[...Array(20)].map((_, i) => {
         const size = 10 + (i % 5) * 4;
         const opacity = 0.3 + (i % 4) * 0.15;
         return (
