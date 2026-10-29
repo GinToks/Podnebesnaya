@@ -32,6 +32,40 @@ export default function OrdersTab({
           <h1 className="serif text-3xl font-light tracking-[0.1em] text-ink">Заказы</h1>
           <p className="text-sm text-ink-muted mt-1">Все оформленные заказы с данными клиентов и составом.</p>
         </div>
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              const res = await fetch("/api/orders?limit=100000");
+              const data = await res.json();
+              const orders = Array.isArray(data) ? data : data.items || [];
+              const header = ["Номер", "Дата", "Клиент", "Email", "Телефон", "Адрес", "Сумма", "Статус"].join(";");
+              const rows = orders.map((o: Order) => [
+                o.id,
+                o.createdAt,
+                `"${(o.customerName || "").replace(/"/g, '""')}"`,
+                o.customerEmail,
+                o.customerPhone || "",
+                `"${(o.customerAddress || "").replace(/"/g, '""')}"`,
+                o.totalPrice,
+                o.status,
+              ].join(";"));
+              const csv = [header, ...rows].join("\n");
+              const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `orders-${new Date().toISOString().slice(0, 10)}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            } catch (e) {
+              alert("Не удалось экспортировать заказы");
+            }
+          }}
+          className="px-4 py-2 rounded-lg border border-mist text-ink text-sm hover:bg-mist transition-colors"
+        >
+          Экспорт CSV
+        </button>
       </div>
       <div className="rounded-xl border border-mist bg-bg overflow-x-auto shadow-sm">
         <div className="p-3 flex flex-col sm:flex-row gap-3 border-b border-mist">
