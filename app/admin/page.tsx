@@ -40,12 +40,6 @@ export default function AdminPage() {
   const { products, addProduct, updateProduct, deleteProduct, fetchProducts: seed, reorderProducts } =
     useCatalogStore();
   const { orders, addOrder, updateOrderStatus, deleteOrder } = useOrderStore();
-  const filteredOrders = orders.filter((o) => {
-    const q = orderSearch.toLowerCase();
-    const matchesSearch = !q || o.id.toLowerCase().includes(q) || o.customerName.toLowerCase().includes(q) || o.customerEmail.toLowerCase().includes(q) || (o.customerPhone || "").toLowerCase().includes(q);
-    const matchesStatus = orderStatusFilter === "all" || o.status === orderStatusFilter;
-    return matchesSearch && matchesStatus;
-  });
   const { codes, addCode, updateCode, deleteCode } = usePromoStore();
   const { banners, addBanner, updateBanner, deleteBanner, fetchBanners } = usePromoBannerStore();
   const { collections, addCollection, updateCollection, deleteCollection } = useCollectionStore();
@@ -85,6 +79,12 @@ export default function AdminPage() {
   const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
   const [orderSearch, setOrderSearch] = useState("");
   const [orderStatusFilter, setOrderStatusFilter] = useState("all");
+  const filteredOrders = orders.filter((o) => {
+    const q = orderSearch.toLowerCase();
+    const matchesSearch = !q || o.id.toLowerCase().includes(q) || o.customerName.toLowerCase().includes(q) || o.customerEmail.toLowerCase().includes(q) || (o.customerPhone || "").toLowerCase().includes(q);
+    const matchesStatus = orderStatusFilter === "all" || o.status === orderStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
   const [messengerStatus, setMessengerStatus] = useState("");
 
   useEffect(() => {
