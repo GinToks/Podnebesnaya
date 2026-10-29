@@ -1,5 +1,5 @@
-import { memo } from "react";
 "use client";
+import { memo } from "react";
 import { useMemo, useState, useRef } from "react";
 import { m, useScroll, useTransform } from "framer-motion";
 import { Filter, X } from "lucide-react";

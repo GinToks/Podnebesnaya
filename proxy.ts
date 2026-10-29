@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, COOKIE_NAME } from "@/lib/auth";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
+import { prisma } from "@/lib/prisma";
 
 async function isAdmin(req: NextRequest): Promise<boolean> {
   const token = req.cookies.get(COOKIE_NAME)?.value;
@@ -106,10 +107,19 @@ export async function proxy(req: NextRequest) {
     }
   }
 
-  // Audit log for admin API mutations (dev only)
-  if (process.env.NODE_ENV !== "production" && pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD") {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-    console.info(JSON.stringify({ audit: true, ts: new Date().toISOString(), method: req.method, path: pathname, ip }));
+  // Audit log for admin API mutations (dev console + persistent in production)
+  if (pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS") {
+    const ip = req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for")?.split(",").pop()?.trim() || "unknown";
+    if (process.env.NODE_ENV !== "production") {
+      console.info(JSON.stringify({ audit: true, ts: new Date().toISOString(), method: req.method, path: pathname, ip }));
+    }
+    // Persist audit entry (best-effort, non-blocking)
+    (async () => {
+      try {
+        await prisma.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS "AuditLog" ("id" TEXT NOT NULL PRIMARY KEY, "ts" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "method" TEXT NOT NULL, "path" TEXT NOT NULL, "ip" TEXT)`);
+        await prisma.$executeRawUnsafe(`INSERT INTO "AuditLog" ("id","method","path","ip") VALUES ($1,$2,$3,$4)`, globalThis.crypto.randomUUID(), req.method, pathname, ip);
+      } catch {}
+    })();
   }
 
   return NextResponse.next();
