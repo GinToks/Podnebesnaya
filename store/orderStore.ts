@@ -26,7 +26,7 @@ interface OrderState {
   isLoading: boolean;
   error: string | null;
   fetchOrders: () => Promise<void>;
-  addOrder: (order: Omit<Order, "id" | "createdAt" | "status">) => Promise<any>;
+  addOrder: (order: Omit<Order, "id" | "createdAt" | "status">) => Promise<Order>;
   updateOrderStatus: (id: string, status: Order["status"]) => Promise<void>;
   deleteOrder: (id: string) => Promise<void>;
   getOrder: (id: string) => Order | undefined;

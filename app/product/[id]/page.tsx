@@ -75,7 +75,7 @@ export default function ProductDetailPage() {
             "@type": "Product",
             name: product.name,
             description: product.description,
-            image: (product.images || []).map((i: any) => i.url).filter(Boolean),
+            image: (product.images || []).map((i: { url?: string }) => i.url).filter(Boolean),
             offers: {
               "@type": "Offer",
               price: product.price,

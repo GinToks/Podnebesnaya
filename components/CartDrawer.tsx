@@ -112,8 +112,9 @@ export default function CartDrawer() {
         });
       } catch {}
     }
-    if (created?.notification && !created.notification.sent) {
-      console.error("Order notification failed:", created.notification.error);
+    const createdNotification = (created as { notification?: { sent?: boolean; error?: string } } | null)?.notification;
+    if (createdNotification && !createdNotification.sent) {
+      console.error("Order notification failed:", createdNotification.error);
     }
     // Decrement stock handled server-side in /api/orders
     if (appliedPromo) {

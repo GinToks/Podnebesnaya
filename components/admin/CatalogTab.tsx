@@ -100,7 +100,7 @@ export default function CatalogTab({ ctx }: { ctx: any }) {
                       onChange={(e) => setDraft({ ...draft, category: e.target.value as ScentCategory })}
                       className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink focus:border-sky outline-none transition-colors"
                     >
-                      {categories.map((c: ScentCategory) => (
+                      {categories.map((c: { id: string; label: string }) => (
                         <option key={c.id} value={c.id}>
                           {c.label}
                         </option>
