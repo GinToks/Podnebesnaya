@@ -15,18 +15,20 @@
   },
   "dependencies": {
     "@hookform/resolvers": "4.1.3",
-    "@prisma/client": "^6.19.3",
+    "@neondatabase/serverless": "^1.2.0",
+    "@prisma/adapter-neon": "^7.10.1",
+    "@prisma/client": "^7.10.1",
     "@upstash/ratelimit": "^2.2.0",
     "@upstash/redis": "^1.40.0",
     "framer-motion": "12.6.0",
     "jose": "^6.2.13",
     "lucide-react": "0.507.0",
-    "next": "^15.5.28",
-    "prisma": "^6.19.3",
+    "next": "^16.4.3",
+    "prisma": "^7.10.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "7.55.0",
-    "zod": "^3.24.2",
+    "zod": "^4.6.7",
     "zustand": "5.0.3"
   },
   "devDependencies": {
@@ -34,12 +36,18 @@
     "@types/node": "22.14.0",
     "@types/react": "19.1.2",
     "@types/react-dom": "19.1.1",
-    "eslint": "9.24.0",
-    "eslint-config-next": "15.2.3",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.3",
     "tailwindcss": "4.1.3",
     "typescript": "5.8.3"
   },
   "optionalDependencies": {
     "lightningcss-linux-x64-gnu": "^1.29.2"
+  },
+  "allowScripts": {
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@7.10.1": true,
+    "prisma@7.10.1": true,
+    "unrs-resolver@1.12.2": true
   }
 }

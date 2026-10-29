@@ -7,7 +7,7 @@ async function isAdmin(req: NextRequest): Promise<boolean> {
   return !!token && (await verifyToken(token));
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Rate limiting for all API routes
