@@ -12,6 +12,7 @@ import Toast from "@/components/Toast";
 import ToastProvider from "@/components/ToastProvider";
 import SakuraPetals from "@/components/SakuraPetals";
 import ThemeProvider from "@/components/ThemeProvider";
+import OfflineIndicator from "@/components/OfflineIndicator";
 import CustomCursor from "@/components/CustomCursor";
 import BambooDecor from "@/components/BambooDecor";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
@@ -141,6 +142,7 @@ ym(${YANDEX_METRICA_ID}, "init", { clickmap:true, trackLinks:true, accurateTrack
             </noscript>
           </>
         )}
+        <OfflineIndicator />
       </body>
     </html>
   );
