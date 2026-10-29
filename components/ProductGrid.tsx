@@ -1,3 +1,4 @@
+import { memo } from "react";
 "use client";
 import { useMemo, useState, useRef } from "react";
 import { m, useScroll, useTransform } from "framer-motion";
@@ -11,7 +12,7 @@ import { useCategoryStore } from "@/store/categoryStore";
 import { useCatalogStore } from "@/store/catalogStore";
 import type { Product, ScentCategory } from "@/data/products";
 
-export default function ProductGrid() {
+function ProductGrid() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
@@ -228,3 +229,5 @@ export default function ProductGrid() {
     </section>
   );
 }
+
+export default memo(ProductGrid);
