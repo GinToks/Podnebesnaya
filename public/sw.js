@@ -1,4 +1,4 @@
-const CACHE_NAME = 'podnebesnaya-v5';
+const CACHE_NAME = 'podnebesnaya-v6';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
