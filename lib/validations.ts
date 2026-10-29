@@ -21,8 +21,10 @@ export const productSchema = z.object({
     .default({ top: [], middle: [], base: [] }),
   offer: z
     .object({
-      title: z.string(),
-      price: z.number(),
+      label: z.string().optional(),
+      active: z.boolean().optional(),
+      title: z.string().optional(),
+      price: z.number().optional(),
       badge: z.string().optional(),
     })
     .optional(),
@@ -93,6 +95,8 @@ export const bannerSchema = z.object({
   active: z.boolean().optional().default(true),
   link: z.string().max(500).optional().default("#catalog"),
   linkText: z.string().max(50).optional().default("Смотреть"),
+  discount: z.number().min(0).max(100).optional().default(0),
+  selectedProductIds: z.array(z.string()).optional().default([]),
 });
 
 export const bannerUpdateSchema = bannerSchema.partial().extend({ id: z.string().min(1) });

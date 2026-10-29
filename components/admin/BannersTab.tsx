@@ -94,7 +94,7 @@ export default function BannersTab({ products }: { products: Product[] }) {
                     if (!endDate) { alert("Укажите дату окончания"); return; }
                     const checked = Array.from(document.querySelectorAll(".banner-product-check:checked")).map((el) => (el as HTMLInputElement).value);
                     if (editingBannerId) {
-                      updateBanner(editingBannerId, {
+                      await updateBanner(editingBannerId, {
                         title,
                         subtitle: subtitle || "",
                         endDate: new Date(endDate).toISOString(),
