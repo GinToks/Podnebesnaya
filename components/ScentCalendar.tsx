@@ -16,6 +16,7 @@ export default function ScentCalendar() {
   let product = productId ? products.find((p) => p.id === productId) : undefined;
   if (!product && products.length > 0) {
     const start = new Date(new Date().getFullYear(), 0, 0).getTime();
+    // eslint-disable-next-line react-hooks/purity
     const dayOfYear = Math.floor((Date.now() - start) / 86400000);
     product = products[dayOfYear % products.length];
   }

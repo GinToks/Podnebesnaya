@@ -5,7 +5,7 @@ let upstashEnabled =
   !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN;
 
 // Cache Ratelimit instances per (max, window) config
-const ratelimitCache = new Map<string, any>();
+const ratelimitCache = new Map<string, { limit: (key: string) => Promise<{ success: boolean }> }>();
 
 async function getUpstashRatelimit(maxRequests: number, windowMs: number) {
   if (!upstashEnabled) return null;
@@ -47,9 +47,19 @@ export async function rateLimit(
   }
 
   const now = Date.now();
-  if (rateLimitMap.size > 10000) {
+  // Prune expired entries to avoid unbounded growth
+  if (rateLimitMap.size > 5000) {
     for (const [k, v] of rateLimitMap) {
       if (now > v.resetAt) rateLimitMap.delete(k);
+    }
+  }
+  if (rateLimitMap.size > 10000) {
+    // Hard cap: drop oldest-ish entries
+    let toDelete = rateLimitMap.size - 10000;
+    for (const k of rateLimitMap.keys()) {
+      if (toDelete <= 0) break;
+      rateLimitMap.delete(k);
+      toDelete -= 1;
     }
   }
   const entry = rateLimitMap.get(key);
@@ -65,9 +75,12 @@ export async function rateLimit(
 }
 
 export function getRateLimitKey(req: Request, prefix: string = ""): string {
+  const nextReq = req as { ip?: string };
+  // Prefer platform-provided IP to avoid X-Forwarded-For spoofing
   const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    nextReq.ip ||
     req.headers.get("x-real-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",").pop()?.trim() ||
     "unknown";
   return `${prefix}:${ip}`;
 }

@@ -74,14 +74,34 @@ export async function proxy(req: NextRequest) {
     }
   }
 
-  // CSRF protection for mutating requests: require Origin matching host
+  // CSRF protection for mutating requests: require Origin matching host (and app URL if configured)
   if (pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS") {
     const origin = req.headers.get("origin");
     const host = req.headers.get("host");
     let originHost = "";
-    try { originHost = new URL(origin || "").hostname; } catch { originHost = ""; }
+    let originProtocol = "";
+    try {
+      const u = new URL(origin || "");
+      originHost = u.hostname;
+      originProtocol = u.protocol;
+    } catch {
+      originHost = "";
+    }
     const hostName = (host || "").split(":")[0];
-    if (!origin || !host || originHost !== hostName) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    let allowed = false;
+    if (origin && host && originHost === hostName) {
+      // In production require https origins
+      if (process.env.NODE_ENV !== "production" || originProtocol === "https:") {
+        allowed = true;
+      }
+    }
+    if (appUrl) {
+      try {
+        if (origin === new URL(appUrl).origin) allowed = true;
+      } catch {}
+    }
+    if (!allowed) {
       return NextResponse.json({ error: "CSRF blocked" }, { status: 403 });
     }
   }

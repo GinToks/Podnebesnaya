@@ -2,6 +2,7 @@
 import { m } from "framer-motion";
 import Image from "next/image";
 import type { ProductImage } from "@/data/products";
+import { useRef } from "react";
 
 interface ProductGalleryProps {
   images: ProductImage[];
@@ -14,13 +15,13 @@ export default function ProductGallery({
   mainImage,
   onSelect,
 }: ProductGalleryProps) {
-  let touchStartX = 0;
+  const touchStartXRef = useRef(0);
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX = e.changedTouches[0]?.clientX ?? 0;
+    touchStartXRef.current = e.changedTouches[0]?.clientX ?? 0;
   };
   const handleTouchEnd = (e: React.TouchEvent) => {
     const endX = e.changedTouches[0]?.clientX ?? 0;
-    const delta = endX - touchStartX;
+    const delta = endX - touchStartXRef.current;
     if (Math.abs(delta) < 40) return;
     const idx = (images || []).findIndex((img) => img.id === mainImage?.id);
     if (idx < 0) return;

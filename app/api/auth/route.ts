@@ -9,13 +9,34 @@ const BLOCK_DURATION = 15 * 60 * 1000;
 const attempts = new Map<string, { count: number; blockedUntil: number }>();
 
 function getClientIp(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const nextReq = req as { ip?: string };
+  return (
+    nextReq.ip ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",").pop()?.trim() ||
+    "unknown"
+  );
 }
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
   const now = Date.now();
 
+  // Prune expired blocks to avoid unbounded memory growth
+  if (attempts.size > 1000) {
+    const nowPrune = Date.now();
+    for (const [k, v] of attempts) {
+      if (v.blockedUntil > 0 && v.blockedUntil < nowPrune) attempts.delete(k);
+    }
+    if (attempts.size > 1000) {
+      let toDelete = attempts.size - 1000;
+      for (const k of attempts.keys()) {
+        if (toDelete <= 0) break;
+        attempts.delete(k);
+        toDelete -= 1;
+      }
+    }
+  }
   const rl = attempts.get(ip) || { count: 0, blockedUntil: 0 };
   if (rl.blockedUntil > now) {
     return NextResponse.json(
