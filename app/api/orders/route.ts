@@ -66,6 +66,19 @@ export async function POST(req: NextRequest) {
   }
   await ensureOrderColumns();
   const data = parsed.data;
+
+  // Compute totalPrice server-side from DB prices (ignore client-supplied total)
+  const productIds = data.items.map((i) => i.productId);
+  const dbProducts = await prisma.product.findMany({ where: { id: { in: productIds } } });
+  const priceMap = new Map(dbProducts.map((p) => [p.id, p.price]));
+  let totalPrice = 0;
+  const normalizedItems = data.items.map((item) => {
+    const price = priceMap.get(item.productId) ?? item.price;
+    totalPrice += price * item.quantity;
+    return { ...item, price };
+  });
+  data.items = normalizedItems;
+
   const order = await prisma.order.create({
     data: {
       id: `ORD-${Math.random().toString(36).slice(2, 9).toUpperCase()}`,
@@ -75,7 +88,7 @@ export async function POST(req: NextRequest) {
       phone: data.customerPhone,
       contactMethod: data.contactMethod,
       items: JSON.stringify(data.items),
-      totalPrice: data.totalPrice,
+      totalPrice: totalPrice,
       status: "new",
     },
   });
@@ -111,7 +124,7 @@ export async function POST(req: NextRequest) {
 
     const itemsText = data.items.map((i: any) => `• ${i.productName} x${i.quantity} — ${i.price * i.quantity} ₽`).join("\n");
     const contactLabel = data.contactMethod === "whatsapp" ? "WhatsApp" : data.contactMethod === "max" ? "Max" : "Telegram";
-    const message = `🛒 Новый заказ ${order.id}\nКлиент: ${data.customerName}\nТелефон: ${data.customerPhone || "—"}\nСвязь: ${contactLabel}\nEmail: ${data.customerEmail}\nАдрес: ${data.customerAddress}\n\nТовары:\n${itemsText}\n\nИтого: ${data.totalPrice} ₽`;
+    const message = `🛒 Новый заказ ${order.id}\nКлиент: ${data.customerName}\nТелефон: ${data.customerPhone || "—"}\nСвязь: ${contactLabel}\nEmail: ${data.customerEmail}\nАдрес: ${data.customerAddress}\n\nТовары:\n${itemsText}\n\nИтого: ${totalPrice} ₽`;
 
     if (settings.tgToken && settings.tgChatId) {
       const tgRes = await fetch(`https://api.telegram.org/bot${settings.tgToken}/sendMessage`, {

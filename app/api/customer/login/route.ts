@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 import { verifyPassword, createSessionToken } from "@/lib/customerAuth";
 import { customerLoginSchema } from "@/lib/validations";
 
@@ -14,6 +15,11 @@ async function ensureTable() {
 export async function POST(req: NextRequest) {
   await ensureTable();
   const body = await req.json().catch(() => ({}));
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const emailForLimit = String(body.email || "").trim().toLowerCase();
+  if (!(await rateLimit(`customer-login:${ip}:${emailForLimit}`, 5, 15 * 60 * 1000))) {
+    return NextResponse.json({ error: "Слишком много попыток. Попробуйте позже." }, { status: 429 });
+  }
   const parsed = customerLoginSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });

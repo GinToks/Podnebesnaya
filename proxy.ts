@@ -78,7 +78,10 @@ export async function proxy(req: NextRequest) {
   if (pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS") {
     const origin = req.headers.get("origin");
     const host = req.headers.get("host");
-    if (!origin || !host || !origin.includes(host)) {
+    let originHost = "";
+    try { originHost = new URL(origin || "").hostname; } catch { originHost = ""; }
+    const hostName = (host || "").split(":")[0];
+    if (!origin || !host || originHost !== hostName) {
       return NextResponse.json({ error: "CSRF blocked" }, { status: 403 });
     }
   }

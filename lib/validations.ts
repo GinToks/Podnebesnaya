@@ -44,7 +44,6 @@ export const orderSchema = z.object({
       price: z.number().min(0),
     })
   ).min(1, "At least one item required"),
-  totalPrice: z.number().min(0),
 });
 
 export const orderStatusSchema = z.object({

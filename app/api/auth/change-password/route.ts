@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, COOKIE_NAME } from "@/lib/auth";
 import { getStoredPassword, setStoredPassword } from "@/lib/adminPassword";
+import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
   // Require authenticated admin
@@ -21,7 +22,9 @@ export async function POST(req: NextRequest) {
   }
 
   const currentStored = await getStoredPassword();
-  if (currentPassword !== currentStored) {
+  const a = Buffer.from(currentPassword);
+  const b = Buffer.from(currentStored);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
     return NextResponse.json({ success: false, error: "Текущий пароль неверный" }, { status: 401 });
   }
 

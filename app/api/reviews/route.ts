@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 import { reviewSchema } from "@/lib/validations";
 
 async function ensureTable() {
@@ -22,6 +23,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await rateLimit(getRateLimitKey(req, "reviews"), 10, 60000))) {
+    return NextResponse.json({ error: "Слишком много запросов" }, { status: 429 });
+  }
   await ensureTable();
   const body = await req.json().catch(() => ({}));
   const parsed = reviewSchema.safeParse(body);
