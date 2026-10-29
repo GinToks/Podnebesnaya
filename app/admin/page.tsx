@@ -74,9 +74,6 @@ export default function AdminPage() {
   const [tgToken, setTgToken] = useState("");
   const [tgChatId, setTgChatId] = useState("");
   const [waNumber, setWaNumber] = useState("");
-  const [giftCards, setGiftCards] = useState<any[]>([]);
-  const [gcAmount, setGcAmount] = useState("");
-  const [gcCode, setGcCode] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<unknown>(null);
   const [orderSearch, setOrderSearch] = useState("");
   const [orderStatusFilter, setOrderStatusFilter] = useState("all");
@@ -105,7 +102,6 @@ export default function AdminPage() {
       fetchProducts();
       fetchOrders();
       fetchBanners();
-      fetch("/api/gift-cards").then((r) => r.json()).then((d) => { if (Array.isArray(d)) setGiftCards(d); }).catch(() => {});
       // Load messenger settings
       fetch("/api/settings/messenger").then((r) => r.json()).then((s) => {
         setTgToken(s.tgToken || "");
@@ -274,16 +270,7 @@ export default function AdminPage() {
           />
         )}
 
-        {tab === "giftcards" && (
-          <GiftCardsTab
-            gcCode={gcCode}
-            setGcCode={setGcCode}
-            gcAmount={gcAmount}
-            setGcAmount={setGcAmount}
-            giftCards={giftCards}
-            setGiftCards={setGiftCards}
-          />
-        )}
+        {tab === "giftcards" && <GiftCardsTab />}
 
         {tab === "users" && <UsersTab />}
 

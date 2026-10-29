@@ -1,17 +1,17 @@
 "use client";
 
-interface GiftCard { code: string; initialAmount: number; balance: number; createdAt: string; }
+import { useEffect, useState } from "react";
+import { useAdminGiftCardStore } from "@/store/adminGiftCardStore";
 
-interface Props {
-  gcCode: string;
-  setGcCode: (v: string) => void;
-  gcAmount: string;
-  setGcAmount: (v: string) => void;
-  giftCards: GiftCard[];
-  setGiftCards: (fn: (prev: GiftCard[]) => GiftCard[]) => void;
-}
+export default function GiftCardsTab() {
+  const { cards, isLoading, fetch, create } = useAdminGiftCardStore();
+  const [gcCode, setGcCode] = useState("");
+  const [gcAmount, setGcAmount] = useState("");
 
-export default function GiftCardsTab({ gcCode, setGcCode, gcAmount, setGcAmount, giftCards, setGiftCards }: Props) {
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
   return (
     <>
       <div className="mb-8">
@@ -34,15 +34,15 @@ export default function GiftCardsTab({ gcCode, setGcCode, gcAmount, setGcAmount,
               onClick={async () => {
                 const amt = Number(gcAmount);
                 if (!amt || amt <= 0) { alert("Укажите сумму"); return; }
-                const res = await fetch("/api/gift-cards", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount: amt, code: gcCode || undefined }) });
-                if (!res.ok) { alert("Ошибка создания"); return; }
-                const card = await res.json();
-                setGiftCards((prev) => [card, ...prev]);
+                const card = await create(amt, gcCode || undefined);
+                if (!card) { alert("Ошибка создания"); return; }
                 setGcAmount("");
                 setGcCode("");
               }}
               className="px-6 py-2.5 rounded-full bg-accent text-bg text-xs font-medium tracking-wide uppercase"
-            >Создать</button>
+            >
+              Создать
+            </button>
           </div>
         </div>
       </div>
@@ -57,10 +57,12 @@ export default function GiftCardsTab({ gcCode, setGcCode, gcAmount, setGcAmount,
             </tr>
           </thead>
           <tbody className="divide-y divide-mist/50">
-            {giftCards.length === 0 ? (
+            {isLoading ? (
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-ink-muted text-sm">Загрузка...</td></tr>
+            ) : cards.length === 0 ? (
               <tr><td colSpan={4} className="px-4 py-8 text-center text-ink-muted text-sm">Карт пока нет.</td></tr>
             ) : (
-              giftCards.map((c) => (
+              cards.map((c) => (
                 <tr key={c.code}>
                   <td className="px-4 py-4 font-medium text-ink">{c.code}</td>
                   <td className="px-4 py-4 text-ink-muted">{c.initialAmount.toLocaleString("ru-RU")} ₽</td>
