@@ -307,3 +307,11 @@
   pointer-events: none;
   animation: bokehFloat 8s ease-in-out infinite;
 }
+
+/* Touch targets for mobile */
+@media (max-width: 768px) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
