@@ -1,5 +1,8 @@
 import crypto from "crypto";
 
+if (process.env.NODE_ENV === "production" && !process.env.CUSTOMER_AUTH_SECRET) {
+  console.warn("[security] CUSTOMER_AUTH_SECRET is not set in production; using fallback. Set CUSTOMER_AUTH_SECRET for stronger security.");
+}
 const SECRET = process.env.CUSTOMER_AUTH_SECRET || "podnebesnaya-customer-secret-change-me";
 
 export function hashPassword(password: string): string {

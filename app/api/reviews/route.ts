@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { reviewSchema } from "@/lib/validations";
 
 async function ensureTable() {
   try {
@@ -23,13 +24,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   await ensureTable();
   const body = await req.json().catch(() => ({}));
-  const productId = String(body.productId || "");
-  const authorName = String(body.authorName || "").trim();
-  const rating = Number(body.rating);
-  const text = String(body.text || "").trim();
-  if (!productId || !authorName || !text || rating < 1 || rating > 5) {
-    return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+  const parsed = reviewSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
+  const { productId, authorName, rating, text } = parsed.data;
   const review = await prisma.review.create({
     data: { productId, authorName, rating, text },
   });

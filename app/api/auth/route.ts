@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createToken, COOKIE_NAME, MAX_AGE } from "@/lib/auth";
 import { getStoredPassword } from "@/lib/adminPassword";
+import crypto from "crypto";
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_DURATION = 15 * 60 * 1000;
@@ -27,14 +28,17 @@ export async function POST(req: NextRequest) {
   const password = body.password || "";
 
   const stored = await getStoredPassword();
-  if (password === stored) {
+  const a = Buffer.from(password);
+  const b = Buffer.from(stored);
+  const passwordOk = a.length === b.length && crypto.timingSafeEqual(a, b);
+  if (passwordOk) {
     attempts.delete(ip);
     const token = await createToken();
     const res = NextResponse.json({ success: true });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "strict",
       maxAge: MAX_AGE,
       path: "/",
     });

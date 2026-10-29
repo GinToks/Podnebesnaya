@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
+import { giftCardCheckSchema } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
-  if (!rateLimit(getRateLimitKey(req, "giftcard-check"), 20, 60000)) {
+  if (!(await rateLimit(getRateLimitKey(req, "giftcard-check"), 20, 60000))) {
     return NextResponse.json({ error: "Слишком много запросов" }, { status: 429 });
   }
-  const body = await req.json();
-  const code = String(body.code || "").trim();
-  if (!code) return NextResponse.json({ error: "Code required" }, { status: 400 });
+  const body = await req.json().catch(() => ({}));
+  const parsed = giftCardCheckSchema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  const code = parsed.data.code.trim();
   try {
     await prisma.$executeRawUnsafe(
       `CREATE TABLE IF NOT EXISTS "GiftCard" ("code" TEXT NOT NULL PRIMARY KEY, "initialAmount" INTEGER NOT NULL, "balance" INTEGER NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP)`

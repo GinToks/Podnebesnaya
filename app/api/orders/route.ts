@@ -56,7 +56,7 @@ function parseOrder(o: any) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!rateLimit(getRateLimitKey(req, "orders"), 10, 60000)) {
+  if (!(await rateLimit(getRateLimitKey(req, "orders"), 10, 60000))) {
     return NextResponse.json({ error: "Слишком много запросов" }, { status: 429 });
   }
   const body = await req.json();

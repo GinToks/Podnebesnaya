@@ -2,18 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, COOKIE_NAME } from "@/lib/auth";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 
+async function isAdmin(req: NextRequest): Promise<boolean> {
+  const token = req.cookies.get(COOKIE_NAME)?.value;
+  return !!token && (await verifyToken(token));
+}
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Rate limiting for all API routes
   if (pathname.startsWith("/api/")) {
     const key = getRateLimitKey(req, pathname);
-    if (!rateLimit(key, 60, 60000)) {
+    if (!(await rateLimit(key, 60, 60000))) {
       return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
   }
 
-  // Protect /admin routes (except /admin/login)
+  // Protect /admin pages (except login)
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
     const token = req.cookies.get(COOKIE_NAME)?.value;
     if (!token || !(await verifyToken(token))) {
@@ -21,22 +26,47 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // Protect admin API routes
+  // Admin-only API surfaces (all methods)
+  if (pathname.startsWith("/api/settings")) {
+    if (!(await isAdmin(req))) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+  if (pathname.startsWith("/api/gift-cards") && !pathname.startsWith("/api/gift-cards/check") && !pathname.startsWith("/api/gift-cards/redeem")) {
+    if (!(await isAdmin(req))) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
+  // Banners: mutations require admin (GET public)
+  if (pathname.startsWith("/api/banners") && req.method !== "GET") {
+    if (!(await isAdmin(req))) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
+  // Catalog: mutations require admin
   if (pathname.startsWith("/api/catalog") && req.method !== "GET") {
-    const token = req.cookies.get(COOKIE_NAME)?.value;
-    if (!token || !(await verifyToken(token))) {
+    if (!(await isAdmin(req))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
 
-  // Protect admin order mutations (PATCH/DELETE) but allow public order creation (POST)
-  if (pathname.startsWith("/api/orders") && (req.method === "PATCH" || req.method === "DELETE")) {
-    const token = req.cookies.get(COOKIE_NAME)?.value;
-    if (!token || !(await verifyToken(token))) {
+  // Orders: GET requires admin; PATCH/DELETE admin; POST public
+  if (pathname.startsWith("/api/orders") && (req.method === "GET" || req.method === "PATCH" || req.method === "DELETE")) {
+    if (!(await isAdmin(req))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
 
+  // Reviews: DELETE requires admin
+  if (pathname.startsWith("/api/reviews") && req.method === "DELETE") {
+    if (!(await isAdmin(req))) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
+  // Auth password change requires admin
   if (pathname.startsWith("/api/auth/change-password")) {
     const token = req.cookies.get(COOKIE_NAME)?.value;
     if (!token || !(await verifyToken(token))) {
@@ -44,13 +74,19 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  // CSRF check for mutating requests
-  if (pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD") {
+  // CSRF protection for mutating requests: require Origin matching host
+  if (pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS") {
     const origin = req.headers.get("origin");
     const host = req.headers.get("host");
-    if (origin && host && !origin.includes(host)) {
+    if (!origin || !host || !origin.includes(host)) {
       return NextResponse.json({ error: "CSRF blocked" }, { status: 403 });
     }
+  }
+
+  // Audit log for admin API mutations
+  if (pathname.startsWith("/api/") && req.method !== "GET" && req.method !== "HEAD") {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    console.info(JSON.stringify({ audit: true, ts: new Date().toISOString(), method: req.method, path: pathname, ip }));
   }
 
   return NextResponse.next();

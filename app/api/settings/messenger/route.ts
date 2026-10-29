@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, COOKIE_NAME } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { messengerSettingsSchema } from "@/lib/validations";
 
 const KEY = "messenger_settings";
 
@@ -35,10 +36,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await req.json().catch(() => ({}));
+  const parsed = messengerSettingsSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
   const settings = {
-    tgToken: String(body.tgToken || "").trim(),
-    tgChatId: String(body.tgChatId || "").trim(),
-    waNumber: String(body.waNumber || "").trim(),
+    tgToken: (parsed.data.tgToken || "").trim(),
+    tgChatId: (parsed.data.tgChatId || "").trim(),
+    waNumber: (parsed.data.waNumber || "").trim(),
   };
   await ensureTable();
   await prisma.adminSetting.upsert({

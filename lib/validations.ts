@@ -51,3 +51,35 @@ export const orderStatusSchema = z.object({
   id: z.string(),
   status: z.enum(["new", "processing", "completed", "cancelled"]),
 });
+export const reviewSchema = z.object({
+  productId: z.string().min(1),
+  authorName: z.string().min(1).max(80),
+  rating: z.number().int().min(1).max(5),
+  text: z.string().min(1).max(2000),
+});
+
+export const customerRegisterSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6).max(128),
+  name: z.string().max(80).optional(),
+});
+
+export const customerLoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1).max(128),
+});
+
+export const giftCardCheckSchema = z.object({
+  code: z.string().min(1).max(64),
+});
+
+export const giftCardRedeemSchema = z.object({
+  code: z.string().min(1).max(64),
+  amount: z.number().positive(),
+});
+
+export const messengerSettingsSchema = z.object({
+  tgToken: z.string().max(200).optional().default(""),
+  tgChatId: z.string().max(100).optional().default(""),
+  waNumber: z.string().max(50).optional().default(""),
+});
