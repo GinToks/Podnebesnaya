@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, m } from "framer-motion";
-import { Menu, X, ShoppingCart, Heart, ArrowLeft, User } from "lucide-react";
+import { Menu, X, ShoppingCart, ArrowLeft, User } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
-import { useWishlistStore } from "@/store/wishlistStore";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
-import WishlistModal from "@/components/WishlistModal";
+import { useCustomerAuthStore } from "@/store/customerAuthStore";
 
 const navLinks = [
   { href: "/", label: "Главная" },
@@ -20,12 +19,12 @@ const navLinks = [
 export default function Header() {
   const { toggle } = useCartStore();
   const count = useCartStore((state) => state.totalQuantity());
-  const wishlistCount = useWishlistStore((state) => state.totalItems());
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [wishlistOpen, setWishlistOpen] = useState(false);
   const isAdmin = useAdminAuthStore((state) => state.isAuthenticated);
-  const checkAuth = useAdminAuthStore((state) => state.checkAuth);
+  const isCustomer = useCustomerAuthStore((state) => state.isAuthenticated);
+  const checkAdminAuth = useAdminAuthStore((state) => state.checkAuth);
+  const checkCustomerAuth = useCustomerAuthStore((state) => state.checkAuth);
   const pathname = usePathname();
   const isHome = pathname === "/";
   const cabinetHref = isAdmin ? "/admin" : "/account";
@@ -33,8 +32,9 @@ export default function Header() {
 
   useEffect(() => {
     setMounted(true);
-    checkAuth();
-  }, [checkAuth]);
+    checkAdminAuth();
+    checkCustomerAuth();
+  }, [checkAdminAuth, checkCustomerAuth]);
 
   return (
     <header className="relative z-20">
@@ -73,6 +73,33 @@ export default function Header() {
                   <ArrowLeft size={16} strokeWidth={2} /> На главную
                 </Link>
               )}
+{isCustomer && (
+                <button
+                  onClick={toggle}
+                  className="flex items-center gap-2 relative p-2 rounded-full hover:bg-mist transition-colors"
+                  aria-label="Корзина"
+                >
+                  <m.span
+                    key={count}
+                    initial={{ scale: 1.4 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                    className="inline-flex"
+                  >
+                    <ShoppingCart size={18} strokeWidth={2} />
+                  </m.span>
+                  <span className="hidden md:block text-xs font-semibold">
+                    Корзина
+                  </span>
+                  <span
+                    className={`absolute -top-1 -right-1 min-w-[1.2rem] h-[1.2rem] rounded-full bg-accent text-bg text-[10px] font-bold flex items-center justify-center ${
+                      mounted && count === 0 ? "hidden" : "block"
+                    }`}
+                  >
+                    {mounted ? count : 0}
+                  </span>
+                </button>
+              )}
               <Link
                 href={cabinetHref}
                 className="flex items-center gap-2 p-2 rounded-full hover:bg-mist transition-colors"
@@ -81,48 +108,6 @@ export default function Header() {
                 <User size={18} strokeWidth={2} />
                 <span className="hidden md:block text-xs font-semibold">{cabinetLabel}</span>
               </Link>
-              <button
-                onClick={() => setWishlistOpen(true)}
-                className="flex items-center gap-2 relative p-2 rounded-full hover:bg-mist transition-colors"
-                aria-label="Избранное"
-              >
-                <Heart size={18} strokeWidth={2} />
-                <span className="hidden md:block text-xs font-semibold">
-                  Избранное
-                </span>
-                <span
-                  className={`absolute -top-1 -right-1 min-w-[1.2rem] h-[1.2rem] rounded-full bg-sakura-dark text-bg text-[10px] font-bold flex items-center justify-center ${
-                    mounted && wishlistCount === 0 ? "hidden" : "block"
-                  }`}
-                >
-                  {mounted ? wishlistCount : 0}
-                </span>
-              </button>
-              <button
-                onClick={toggle}
-                className="flex items-center gap-2 relative p-2 rounded-full hover:bg-mist transition-colors"
-                aria-label="Корзина"
-              >
-                <m.span
-                  key={count}
-                  initial={{ scale: 1.4 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                  className="inline-flex"
-                >
-                  <ShoppingCart size={18} strokeWidth={2} />
-                </m.span>
-                <span className="hidden md:block text-xs font-semibold">
-                  Корзина
-                </span>
-                <span
-                  className={`absolute -top-1 -right-1 min-w-[1.2rem] h-[1.2rem] rounded-full bg-accent text-bg text-[10px] font-bold flex items-center justify-center ${
-                    mounted && count === 0 ? "hidden" : "block"
-                  }`}
-                >
-                  {mounted ? count : 0}
-                </span>
-              </button>
 
             </nav>
             <button
@@ -165,19 +150,6 @@ export default function Header() {
                     </Link>
                   )}
                   <button
-                    onClick={() => { setMobileOpen(false); setWishlistOpen(true); }}
-                    className="block py-3 text-sm font-medium tracking-wide uppercase text-ink hover:text-accent transition-colors flex items-center justify-between w-full text-left"
-                  >
-                    Избранное
-                    <span
-                      className={`inline-block min-w-[1.2rem] h-[1.2rem] rounded-full bg-sakura-dark text-bg text-[10px] font-bold flex items-center justify-center ${
-                        mounted && wishlistCount === 0 ? "opacity-0" : "opacity-100"
-                      }`}
-                    >
-                      {mounted ? wishlistCount : 0}
-                    </span>
-                  </button>
-                  <button
                     onClick={toggle}
                     className="block py-3 text-sm font-medium tracking-wide uppercase text-ink hover:text-accent transition-colors flex items-center justify-between"
                     aria-label="Корзина"
@@ -197,7 +169,6 @@ export default function Header() {
           )}
         </AnimatePresence>
       </div>
-      <WishlistModal isOpen={wishlistOpen} onClose={() => setWishlistOpen(false)} />
     </header>
   );
 }

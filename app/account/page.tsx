@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { User, Mail, Package, LogOut, CheckCircle2, AlertCircle, Send, ShoppingBag } from "lucide-react";
+import { User, Mail, Package, LogOut, CheckCircle2, AlertCircle, Send, ShoppingBag, Heart, Trash2 } from "lucide-react";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 interface User { email: string; name: string | null; emailVerified?: boolean }
 interface OrderItem { productId: string; productName: string; quantity: number; price: number }
@@ -16,6 +17,9 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 export default function AccountPage() {
+  const wishlistItems = useWishlistStore((s) => s.items);
+  const removeWishlist = useWishlistStore((s) => s.removeItem);
+  const clearWishlist = useWishlistStore((s) => s.clear);
   const [user, setUser] = useState<User | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -215,6 +219,31 @@ export default function AccountPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Wishlist */}
+        <div className="mb-8 bg-bg-elevated border border-mist rounded-2xl p-6 shadow-sm">
+          <h2 className="serif text-xl font-light tracking-[0.08em] text-ink mb-4 flex items-center gap-2">
+            <Heart className="w-5 h-5 text-sage" /> Избранное
+          </h2>
+          {wishlistItems.length === 0 ? (
+            <p className="text-ink-muted text-sm text-center py-6">В избранном пока пусто</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-3">
+              {wishlistItems.map((p) => (
+                <div key={p.id} className="flex items-center gap-3 p-3 border border-mist rounded-xl">
+                  <img src={p.images?.[0]?.url || "/og-image.png"} alt={p.name} className="w-12 h-12 rounded-lg object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-ink truncate">{p.name}</p>
+                    <p className="text-xs text-ink-muted">{p.price.toLocaleString("ru-RU")} ₽</p>
+                  </div>
+                  <button onClick={() => removeWishlist(p.id)} className="p-2 text-ink-muted hover:text-accent transition-colors" aria-label="Удалить">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Orders */}

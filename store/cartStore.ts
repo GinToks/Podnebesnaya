@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import type { Product } from "@/data/products";
 import { useToastStore } from "@/store/toastStore";
+import { useCustomerAuthStore } from "@/store/customerAuthStore";
 
 export interface CartItem {
   product: Product;
@@ -33,6 +34,15 @@ export const useCartStore = create<CartState>()(
         items: [],
         isOpen: false,
         addItem: (product, quantity = 1) => {
+          if (!useCustomerAuthStore.getState().isAuthenticated) {
+            useToastStore.getState().addToast({
+              type: "error",
+              title: "Требуется вход",
+              message: "Зарегистрируйтесь или войдите, чтобы добавлять товары в корзину",
+            });
+            if (typeof window !== "undefined") window.location.href = "/account";
+            return;
+          }
           const items = sanitizeItems(get().items);
           const existing = items.find((i) => i.product.id === product.id);
           if (existing) {

