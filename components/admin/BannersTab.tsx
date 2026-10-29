@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { useCatalogStore } from "@/store/catalogStore";
+import type { Product } from "@/data/products";
 import { usePromoBannerStore } from "@/store/promoBannerStore";
 
-export default function BannersTab({ products }: { products: any[] }) {
+export default function BannersTab({ products }: { products: Product[] }) {
   const { banners, addBanner, updateBanner, deleteBanner, fetchBanners } = usePromoBannerStore();
   const { updateProduct } = useCatalogStore();
   const [editingBannerId, setEditingBannerId] = useState<string | null>(null);

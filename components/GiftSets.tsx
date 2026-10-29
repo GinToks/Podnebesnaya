@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Gift, ShoppingCart } from "lucide-react";
 import { useGiftSetStore } from "@/store/giftSetStore";
+import type { GiftSet } from "@/store/giftSetStore";
 import { useCatalogStore } from "@/store/catalogStore";
 import { useCartStore } from "@/store/cartStore";
 import { useToastStore } from "@/store/toastStore";
@@ -19,7 +20,7 @@ export default function GiftSets() {
   const activeSets = getActiveSets();
   if (activeSets.length === 0) return null;
 
-  const addToCart = (gs: any) => {
+  const addToCart = (gs: GiftSet) => {
     const product: Product = {
       id: `giftset-${gs.id}`,
       name: gs.name,

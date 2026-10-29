@@ -63,8 +63,8 @@ function parseOrder(o: Record<string, unknown>) {
   return {
     ...o,
     customerPhone: o.phone ?? o.customerPhone ?? null,
-    items: JSON.parse(o.items),
-    createdAt: o.createdAt.toISOString(),
+    items: JSON.parse(String(o.items)),
+    createdAt: new Date(String(o.createdAt)).toISOString(),
   };
 }
 

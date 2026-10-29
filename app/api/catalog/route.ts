@@ -48,9 +48,9 @@ export async function GET() {
 function parseProduct(p: Record<string, unknown>) {
   return {
     ...p,
-    images: JSON.parse(p.images),
-    notes: JSON.parse(p.notes),
-    offer: p.offer ? JSON.parse(p.offer) : undefined,
+    images: JSON.parse(String(p.images)),
+    notes: JSON.parse(String(p.notes)),
+    offer: p.offer ? JSON.parse(String(p.offer)) : undefined,
   };
 }
 
@@ -108,7 +108,7 @@ export async function PUT(req: NextRequest) {
   if (patch.originalPrice !== undefined) data.originalPrice = patch.originalPrice;
   if (patch.discountPercent !== undefined) data.discountPercent = patch.discountPercent;
 
-  const product = await prisma.product.update({ where: { id }, data });
+  const product = await prisma.product.update({ where: { id: String(id) }, data: data as never });
   return NextResponse.json(parseProduct(product));
 }
 

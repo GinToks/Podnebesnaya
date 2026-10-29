@@ -2,6 +2,7 @@
 import { AnimatePresence, m } from "framer-motion";
 import { X, Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { useWishlistStore } from "@/store/wishlistStore";
+import type { Product } from "@/data/products";
 import { useCartStore } from "@/store/cartStore";
 import { useToastStore } from "@/store/toastStore";
 import Image from "next/image";
@@ -17,7 +18,7 @@ export default function WishlistModal({ isOpen, onClose }: WishlistModalProps) {
   const { addItem } = useCartStore();
   const { addToast } = useToastStore();
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: Product) => {
     addItem(product);
     addToast({ type: "success", title: "Добавлено в корзину", message: product.name });
   };

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function TrackPage() {
   const [orderId, setOrderId] = useState("");
-  const [order, setOrder] = useState<unknown>(null);
+  const [order, setOrder] = useState<{ id: string; status: string; trackingNumber?: string; totalPrice: number; createdAt: string } | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ export default function TrackPage() {
       const res = await fetch("/api/orders");
       if (!res.ok) throw new Error("fail");
       const orders = await res.json();
-      const found = orders.find((o: any) => o.id === orderId.trim());
+      const found = orders.find((o: { id: string }) => o.id === orderId.trim());
       if (!found) setError("Заказ не найден");
       else setOrder(found);
     } catch {

@@ -1,8 +1,9 @@
 "use client";
 
 import { useCollectionStore } from "@/store/collectionStore";
+import type { Product } from "@/data/products";
 
-export default function CollectionsTab({ products }: { products: any[] }) {
+export default function CollectionsTab({ products }: { products: Product[] }) {
   const { collections, addCollection, updateCollection, deleteCollection } = useCollectionStore();
   return (
           <>

@@ -10,7 +10,7 @@ import ProductGallery from "@/components/ProductGallery";
 import BreathingCandle from "@/components/BreathingCandle";
 import RelatedProducts from "@/components/RelatedProducts";
 import ReviewsBlock from "@/components/ReviewsBlock";
-import type { Product } from "@/data/products";
+import type { Product, ProductImage } from "@/data/products";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -19,7 +19,7 @@ export default function ProductDetailPage() {
 
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [mainImage, setMainImage] = useState<unknown>(null);
+  const [mainImage, setMainImage] = useState<ProductImage | null>(null);
 
   const product: Product | undefined = id && products.length ? getProduct(String(id)) : undefined;
 

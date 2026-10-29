@@ -30,7 +30,7 @@ import CollectionsTab from "@/components/admin/CollectionsTab";
 import SettingsTab from "@/components/admin/SettingsTab";
 import CatalogTab from "@/components/admin/CatalogTab";
 import { m, AnimatePresence } from "framer-motion";
-import type { Product, ScentCategory } from "@/data/products";
+import type { Product, ScentCategory, ScentNotes } from "@/data/products";
 
 type AdminTab = "catalog" | "orders" | "promos" | "banners" | "collections" | "categories" | "quiz" | "analytics" | "settings" | "scent-calendar" | "gift-sets" | "giftcards";
 
@@ -150,7 +150,7 @@ export default function AdminPage() {
       name: draft.name,
       description: draft.description,
       fullDescription: draft.fullDescription ?? "",
-      notes: (draft.notes as { top?: string[]; middle?: string[]; base?: string[] }) ?? { top: [], middle: [], base: [] },
+      notes: (draft.notes as ScentNotes) ?? { top: [], middle: [], base: [] },
       price: Number(draft.price) || 0,
       costPrice: draft.costPrice ?? undefined,
       category: (draft.category as ScentCategory) || "fresh",

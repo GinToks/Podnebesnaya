@@ -2,7 +2,7 @@
 
 import { compressImage } from "@/lib/imageCompression";
 import { useCategoryStore } from "@/store/categoryStore";
-import type { ScentCategory } from "@/data/products";
+import type { ScentCategory, Product } from "@/data/products";
 import SearchBarAdmin from "@/components/admin/SearchBarAdmin";
 import { Plus, Check, Save, X } from "lucide-react";
 import Image from "next/image";
@@ -20,11 +20,11 @@ export default function CatalogTab({ ctx }: { ctx: any }) {
                 <p className="text-sm text-ink-muted mt-1">
                   Редактируйте товары, цены и промо-предложения. Изменения видны на сайте сразу.
                 </p>
-              {products.some((p: any) => (p.stock ?? 0) <= 3) && (
+              {products.some((p: Product) => (p.stock ?? 0) <= 3) && (
                 <div className="mt-3 p-3 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 text-sm">
                   <p className="font-medium mb-1">⚠️ Низкий остаток:</p>
                   <ul className="list-disc list-inside text-xs">
-                    {products.filter((p: any) => (p.stock ?? 0) <= 3).map((p: any) => (
+                    {products.filter((p: Product) => (p.stock ?? 0) <= 3).map((p: Product) => (
                       <li key={p.id}>{p.name} — {p.stock ?? 0} шт.</li>
                     ))}
                   </ul>
@@ -100,7 +100,7 @@ export default function CatalogTab({ ctx }: { ctx: any }) {
                       onChange={(e) => setDraft({ ...draft, category: e.target.value as ScentCategory })}
                       className="w-full px-3 py-2 rounded bg-mist border border-mist text-ink focus:border-sky outline-none transition-colors"
                     >
-                      {categories.map((c: any) => (
+                      {categories.map((c: ScentCategory) => (
                         <option key={c.id} value={c.id}>
                           {c.label}
                         </option>
@@ -271,7 +271,7 @@ export default function CatalogTab({ ctx }: { ctx: any }) {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-mist bg-mist">
-                    <th className="px-4 py-3 w-10"><input type="checkbox" onChange={(e) => { if (e.target.checked) setSelectedProducts(filteredProducts.map((p: any) => p.id)); else setSelectedProducts([]); }} checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0} className="rounded border-mist" /></th>
+                    <th className="px-4 py-3 w-10"><input type="checkbox" onChange={(e) => { if (e.target.checked) setSelectedProducts(filteredProducts.map((p: Product) => p.id)); else setSelectedProducts([]); }} checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0} className="rounded border-mist" /></th>
                     <th className="px-4 py-3 font-medium text-ink-muted uppercase tracking-wider text-[11px]">Товар</th>
                     <th className="px-4 py-3 font-medium text-ink-muted uppercase tracking-wider text-[11px]">Цена</th>
                     <th className="px-4 py-3 font-medium text-ink-muted uppercase tracking-wider text-[11px]">Остаток</th>
@@ -287,9 +287,9 @@ export default function CatalogTab({ ctx }: { ctx: any }) {
                       </td>
                     </tr>
                   ) : (
-                    filteredProducts.map((product: any) => (
+                    filteredProducts.map((product: Product) => (
                       <tr key={product.id} draggable onDragStart={() => setDraggedId(product.id)} onDragOver={(e) => e.preventDefault()} onDrop={() => { if (draggedId && draggedId !== product.id) { reorderProducts(draggedId, product.id); setDraggedId(null); } }} className="hover:bg-mist/30 transition-colors group cursor-move">
-                        <td className="px-4 py-4"><input type="checkbox" checked={selectedProducts.includes(product.id)} onChange={(e) => { if (e.target.checked) setSelectedProducts([...selectedProducts, product.id]); else setSelectedProducts(selectedProducts.filter((id: any) => id !== product.id)); }} className="rounded border-mist" /></td>
+                        <td className="px-4 py-4"><input type="checkbox" checked={selectedProducts.includes(product.id)} onChange={(e) => { if (e.target.checked) setSelectedProducts([...selectedProducts, product.id]); else setSelectedProducts(selectedProducts.filter((id: string) => id !== product.id)); }} className="rounded border-mist" /></td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: product.accent }} />

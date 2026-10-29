@@ -31,7 +31,7 @@ export default async function ProductLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let jsonLd: any = null;
+  let jsonLd: Record<string, unknown> | null = null;
   try {
     const product = await prisma.product.findUnique({ where: { id } });
     if (product) {
@@ -55,7 +55,7 @@ export default async function ProductLayout({
       {jsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
       )}
       {children}

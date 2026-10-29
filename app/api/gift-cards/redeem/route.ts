@@ -22,11 +22,11 @@ export async function POST(req: NextRequest) {
     );
   } catch {}
 
-  const rows = await prisma.$queryRawUnsafe(
+  const rows = (await prisma.$queryRawUnsafe(
     `UPDATE "GiftCard" SET balance = balance - $1 WHERE code = $2 AND balance >= $1 RETURNING *`,
     amount,
     code
-  );
+  )) as { balance: number }[];
 
   if (!rows || rows.length === 0) {
     const card = await prisma.giftCard.findUnique({ where: { code } });
